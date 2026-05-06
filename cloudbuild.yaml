@@ -2,33 +2,37 @@ substitutions:
   _REGION: us-central1
   _SERVICE: hotel-lunara-backend
   _REPOSITORY: apps
-  _IMAGE: us-central1-docker.pkg.dev/$PROJECT_ID/apps/hotel-lunara-backend:$COMMIT_SHA
   _CLOUDSQL_INSTANCE: hotel-lunara:us-central1:lunara-db
 
 steps:
   - name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "${_IMAGE}", "."]
+    args:
+      - build
+      - -t
+      - us-central1-docker.pkg.dev/$PROJECT_ID/apps/hotel-lunara-backend:$COMMIT_SHA
+      - .
 
   - name: gcr.io/cloud-builders/docker
-    args: ["push", "${_IMAGE}"]
+    args:
+      - push
+      - us-central1-docker.pkg.dev/$PROJECT_ID/apps/hotel-lunara-backend:$COMMIT_SHA
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args:
       - run
       - deploy
-      - ${_SERVICE}
-      - --image=${_IMAGE}
+      - hotel-lunara-backend
+      - --image=us-central1-docker.pkg.dev/$PROJECT_ID/apps/hotel-lunara-backend:$COMMIT_SHA
       - --platform=managed
-      - --region=${_REGION}
+      - --region=us-central1
       - --allow-unauthenticated
-      - --add-cloudsql-instances=${_CLOUDSQL_INSTANCE}
+      - --add-cloudsql-instances=hotel-lunara:us-central1:lunara-db
       - --set-env-vars=SPRING_PROFILES_ACTIVE=prod,DB_PORT=5432,OPENAI_MODEL=gpt-4o-mini
       - --set-secrets=DB_NAME=DB_NAME:latest,DB_USER=DB_USER:latest,DB_PASSWORD=DB_PASSWORD:latest,JWT_SECRET=JWT_SECRET:latest,OPENAI_API_KEY=OPENAI_API_KEY:latest,CORS_ALLOWED_ORIGINS=CORS_ALLOWED_ORIGINS:latest,JWT_EXPIRATION=JWT_EXPIRATION:latest,JWT_REFRESH_EXPIRATION=JWT_REFRESH_EXPIRATION:latest
 
 images:
-  - ${_IMAGE}
+  - us-central1-docker.pkg.dev/$PROJECT_ID/apps/hotel-lunara-backend:$COMMIT_SHA
 
 options:
-  dynamicSubstitutions: true
   logging: CLOUD_LOGGING_ONLY
