@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080',
+  apiUrl: 'https://hotel-lunara-backend-476475787309.us-central1.run.app',
 };

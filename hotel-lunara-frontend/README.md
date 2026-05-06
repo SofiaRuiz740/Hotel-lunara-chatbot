@@ -1,11 +1,11 @@
 # Hotel Lunara Frontend
 
-Frontend Angular 21 para Hotel Lunara, conectado al backend Spring Boot en `http://localhost:8080`.
+Frontend Angular 21 para Hotel Lunara, conectado por defecto al backend desplegado en `https://hotel-lunara-backend-476475787309.us-central1.run.app`.
 
 ## Requisitos
 
 - Node.js 20 o superior
-- Backend de Hotel Lunara corriendo en `http://localhost:8080`
+- Backend de Hotel Lunara disponible en Cloud Run o en un entorno compatible
 
 ## Levantar en desarrollo
 
@@ -17,7 +17,7 @@ npm run start
 La app usa por defecto:
 
 - Frontend: `http://localhost:4200`
-- Backend: `http://localhost:8080`
+- Backend: `https://hotel-lunara-backend-476475787309.us-central1.run.app`
 
 ## Rutas principales
 
@@ -82,5 +82,5 @@ docker run --rm -p 8081:8080 hotel-lunara-frontend
 
 ## Nota de despliegue
 
-`src/environments/environment.prod.ts` mantiene una URL placeholder para Cloud Run.
-Antes de desplegar en produccion, reemplaza esa URL por la del backend real.
+Produccion puede sobrescribir la URL del backend con la variable `API_BASE_URL`.
+Si no se define, el frontend usara `https://hotel-lunara-backend-476475787309.us-central1.run.app`.

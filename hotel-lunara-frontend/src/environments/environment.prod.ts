@@ -9,5 +9,5 @@ const runtimeApiUrl = typeof window !== 'undefined' ? window.__API_URL__ : undef
 export const environment = {
   production: true,
   // Cloud Run sets this at runtime via `assets/runtime-config.js`.
-  apiUrl: runtimeApiUrl ?? 'https://hotel-lunara-backend-xxxx.run.app',
+  apiUrl: runtimeApiUrl ?? 'https://hotel-lunara-backend-476475787309.us-central1.run.app',
 };

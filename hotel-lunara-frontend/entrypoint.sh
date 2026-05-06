@@ -4,7 +4,7 @@ set -eu
 # Runtime-config: allows injecting the backend URL without rebuilding the frontend.
 # Cloud Run can set API_BASE_URL, and this file will expose it as `window.__API_URL__`.
 
-API_BASE_URL="${API_BASE_URL:-https://hotel-lunara-backend-xxxx.run.app}"
+API_BASE_URL="${API_BASE_URL:-https://hotel-lunara-backend-476475787309.us-central1.run.app}"
 
 mkdir -p /usr/share/nginx/html/assets
 
