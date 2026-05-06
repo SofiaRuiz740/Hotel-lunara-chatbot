@@ -1,26 +1,31 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${PORT:8080}
 
 spring:
   application:
     name: hotel-lunara
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:hotel_lunara}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         format_sql: true
         jdbc:
           time_zone: UTC
+
   jackson:
     serialization:
       write-dates-as-timestamps: false
+
   mvc:
     problemdetails:
       enabled: false
@@ -46,20 +51,25 @@ app:
   ai:
     provider: ${AI_PROVIDER:auto}
   time-zone: ${APP_TIME_ZONE:UTC}
+
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:86400000}
     refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
   openai:
     api-key: ${OPENAI_API_KEY:}
     model: ${OPENAI_MODEL:gpt-4o-mini}
     base-url: https://api.openai.com/v1/chat/completions
+
   ollama:
     model: ${OLLAMA_MODEL:llama3.2}
     base-url: ${OLLAMA_BASE_URL:http://localhost:11434/api/chat}
     preflight-timeout-ms: ${OLLAMA_PREFLIGHT_TIMEOUT_MS:800}
+
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+
   hotel:
     name: Hotel Lunara
     stars: 4
@@ -73,6 +83,7 @@ app:
     check-out-time: "12:00"
     cancellation-policy: Cancelacion gratuita con mas de 48 horas de anticipacion.
     images: https://images.unsplash.com/photo-1566073771259-6a8506099945,https://images.unsplash.com/photo-1551882547-ff40c63fe5fa,https://images.unsplash.com/photo-1522798514-97ceb8c4f1c8
+
   policy:
     room-cancellation-hours: ${ROOM_CANCELLATION_HOURS:48}
     restaurant-cancellation-hours: ${RESTAURANT_CANCELLATION_HOURS:2}
@@ -83,6 +94,7 @@ app:
       lunch-end: ${RESTAURANT_LUNCH_END:15:00}
       dinner-start: ${RESTAURANT_DINNER_START:19:00}
       dinner-end: ${RESTAURANT_DINNER_END:23:00}
+
   security:
     concierge:
       rate-limit:
@@ -94,6 +106,7 @@ spring:
   config:
     activate:
       on-profile: dev
+
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -104,7 +117,15 @@ spring:
   config:
     activate:
       on-profile: prod
+
+  datasource:
+    url: jdbc:postgresql:///${DB_NAME}?cloudSqlInstance=hotel-lunara:us-central1:lunara-db&socketFactory=com.google.cloud.sql.postgres.SocketFactory
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
