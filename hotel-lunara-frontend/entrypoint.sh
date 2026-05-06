@@ -1,10 +1,10 @@
 #!/bin/sh
 set -eu
 
-# Runtime-config: allows injecting the backend URL without rebuilding the frontend.
-# Cloud Run can set API_BASE_URL, and this file will expose it as `window.__API_URL__`.
+# Runtime-config: allows overriding the API base URL without rebuilding the frontend.
+# If API_BASE_URL is empty, the app uses same-origin `/api` and nginx proxies it.
 
-API_BASE_URL="${API_BASE_URL:-https://hotel-lunara-backend-476475787309.us-central1.run.app}"
+API_BASE_URL="${API_BASE_URL:-}"
 
 mkdir -p /usr/share/nginx/html/assets
 

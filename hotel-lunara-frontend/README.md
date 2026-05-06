@@ -1,11 +1,12 @@
 # Hotel Lunara Frontend
 
-Frontend Angular 21 para Hotel Lunara, conectado por defecto al backend desplegado en `https://hotel-lunara-backend-476475787309.us-central1.run.app`.
+Frontend Angular 21 para Hotel Lunara.
+En desarrollo y producción, el navegador consume `/api` en la misma origin y esa ruta se reenvía al backend desplegado en `https://hotel-lunara-backend-476475787309.us-central1.run.app`.
 
 ## Requisitos
 
 - Node.js 20 o superior
-- Backend de Hotel Lunara disponible en Cloud Run o en un entorno compatible
+- Acceso al backend desplegado o a otro backend compatible si quieres cambiar el proxy
 
 ## Levantar en desarrollo
 
@@ -17,7 +18,8 @@ npm run start
 La app usa por defecto:
 
 - Frontend: `http://localhost:4200`
-- Backend: `https://hotel-lunara-backend-476475787309.us-central1.run.app`
+- Backend real: `https://hotel-lunara-backend-476475787309.us-central1.run.app`
+- Base consumida por el navegador: `/api`
 
 ## Rutas principales
 
@@ -82,5 +84,6 @@ docker run --rm -p 8081:8080 hotel-lunara-frontend
 
 ## Nota de despliegue
 
-Produccion puede sobrescribir la URL del backend con la variable `API_BASE_URL`.
-Si no se define, el frontend usara `https://hotel-lunara-backend-476475787309.us-central1.run.app`.
+- En desarrollo, `ng serve` usa `proxy.conf.json` para reenviar `/api` al backend desplegado.
+- En producción, nginx reenvía `/api` al backend desplegado.
+- Si necesitas un backend distinto, puedes definir `API_BASE_URL` en el contenedor frontend.

@@ -1,20 +1,21 @@
-FROM node:20-alpine AS builder
+# Build Angular
+FROM node:20 AS build
+
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
-RUN npm run build -- --configuration=production
 
+RUN npm run build
+
+# Nginx
 FROM nginx:alpine
 
-COPY --from=builder /app/dist/hotel-lunara-frontend/browser /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist/hotel-lunara-frontend/browser /usr/share/nginx/html
 
 EXPOSE 8080
 
-CMD ["/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

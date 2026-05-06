@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://hotel-lunara-backend-476475787309.us-central1.run.app",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info"
+  }
+}
