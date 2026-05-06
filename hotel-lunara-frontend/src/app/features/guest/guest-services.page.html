@@ -1,0 +1,113 @@
+<div class="guest-services">
+  <header class="guest-services__header">
+    <div>
+      <span class="eyebrow">Servicios</span>
+      <h1 class="title-lg">Solicita servicios desde una sola superficie</h1>
+      <p class="text-muted">Elige el servicio, valida disponibilidad y deja trazabilidad del pedido en tu cuenta.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <app-loading-skeleton [count]="4" cardHeight="16rem"></app-loading-skeleton>
+  } @else {
+    <section class="guest-services__catalog">
+      @for (service of services(); track service.id) {
+        <button class="guest-services__service-card surface" type="button" [class.active]="selectedService()?.id === service.id" (click)="chooseService(service.id)">
+          <div class="guest-services__service-top">
+            <span class="tag">{{ service.categoria }}</span>
+            <strong>{{ currency(service.precio) }}</strong>
+          </div>
+          <h2>{{ service.nombre }}</h2>
+          <p>{{ service.descripcion }}</p>
+          <span>{{ service.duracion }} min · {{ service.horarioApertura.slice(0, 5) }} - {{ service.horarioCierre.slice(0, 5) }}</span>
+        </button>
+      }
+    </section>
+
+    <div class="split-grid">
+      <section class="surface guest-services__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Nueva solicitud</h2>
+            <p>Programa fecha, hora y notas del servicio.</p>
+          </div>
+        </div>
+
+        <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="field-group">
+            <label for="serviceReservationId">Reserva asociada</label>
+            <select id="serviceReservationId" formControlName="reservationId">
+              <option [value]="0">Sin asociar</option>
+              @for (reservation of activeReservations(); track reservation.id) {
+                <option [value]="reservation.id">
+                  {{ reservation.codigoReserva }} · Habitacion {{ reservation.roomNumero }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="serviceDate">Fecha</label>
+              <input id="serviceDate" type="date" formControlName="fechaSolicitada" [min]="today" />
+            </div>
+            <div class="field-group">
+              <label for="serviceTime">Hora</label>
+              <input id="serviceTime" type="time" formControlName="horaSolicitada" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="serviceNotes">Notas</label>
+            <textarea id="serviceNotes" formControlName="notas"></textarea>
+          </div>
+
+          @if (availability(); as available) {
+            <div class="guest-services__availability" [class.unavailable]="!available.disponible">
+              <strong>{{ available.serviceNombre }}</strong>
+              <span>{{ available.cuposDisponibles }} cupos disponibles</span>
+            </div>
+          }
+
+          <button class="primary-button" type="submit" [disabled]="saving() || !selectedService()">
+            {{ saving() ? 'Guardando...' : 'Crear solicitud' }}
+          </button>
+        </form>
+      </section>
+
+      <section class="surface guest-services__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Solicitudes recientes</h2>
+            <p>Estado de los servicios ya programados.</p>
+          </div>
+        </div>
+
+        @if (!requests().length) {
+          <div class="empty-state">
+            <strong>No hay solicitudes registradas.</strong>
+            <p>Selecciona un servicio para empezar.</p>
+          </div>
+        } @else {
+          <div class="list-rows">
+            @for (request of requests(); track request.id) {
+              <article class="list-row">
+                <div class="list-row__top">
+                  <div>
+                    <strong>{{ request.serviceNombre }}</strong>
+                    <span>{{ formatDate(request.fechaSolicitada) }} · {{ formatTime(request.horaSolicitada) }}</span>
+                  </div>
+                  <app-status-badge [status]="request.estado"></app-status-badge>
+                </div>
+                <div class="list-row__meta">
+                  <span>{{ request.serviceCategoria }}</span>
+                  <span>{{ currency(request.precioAplicado) }}</span>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>

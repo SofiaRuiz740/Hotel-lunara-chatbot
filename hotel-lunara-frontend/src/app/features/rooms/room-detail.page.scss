@@ -1,0 +1,144 @@
+.room-detail-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.room-detail-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.room-detail-page__layout {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(0, 1.4fr) minmax(20rem, 0.8fr);
+}
+
+.room-detail-page__content,
+.room-detail-page__booking {
+  display: grid;
+  gap: 1rem;
+}
+
+.room-detail-page__booking {
+  align-self: start;
+  position: sticky;
+  top: 6rem;
+  padding: 1.2rem;
+}
+
+.room-detail-page__gallery {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.room-detail-page__gallery-item {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.room-detail-page__gallery-item span {
+  display: block;
+  min-height: 11rem;
+  border-radius: var(--radius-lg);
+  background-size: cover;
+  background-position: center;
+}
+
+.room-detail-page__gallery-item.featured {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.room-detail-page__gallery-item.featured span {
+  min-height: 22.85rem;
+}
+
+.room-detail-page__panel {
+  padding: 1.2rem;
+}
+
+.room-detail-page__similar-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.room-detail-page__similar-card {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.room-detail-page__similar-image {
+  min-height: 9rem;
+  background-size: cover;
+  background-position: center;
+}
+
+.room-detail-page__similar-body {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.9rem;
+}
+
+.room-detail-page__similar-body span {
+  color: var(--color-text-secondary);
+}
+
+.room-detail-page__price-summary {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
+}
+
+.room-detail-page__price-summary div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.room-detail-page__price-summary strong {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+
+.room-detail-page__lightbox {
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+@media (max-width: 1080px) {
+  .room-detail-page__layout,
+  .room-detail-page__similar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .room-detail-page__booking {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .room-detail-page__header,
+  .room-detail-page__gallery,
+  .room-detail-page__price-summary {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .room-detail-page__gallery-item.featured {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .room-detail-page__gallery-item.featured span {
+    min-height: 11rem;
+  }
+}

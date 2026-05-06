@@ -1,0 +1,118 @@
+<div class="auth-page">
+  <div class="auth-page__layout page-container page-block">
+    <section class="auth-page__visual surface--strong">
+      <div class="auth-page__visual-image" [style.background-image]="'linear-gradient(180deg, rgba(8, 15, 18, 0.2), rgba(8, 15, 18, 0.68)), url(' + authImage + ')'"></div>
+      <div class="auth-page__visual-copy">
+        <span class="eyebrow">Registro</span>
+        <h1 class="title-lg">Crea tu cuenta y deja lista tu estancia</h1>
+        <p>Completa tus datos para gestionar reservas, preferencias y una atencion mas personalizada.</p>
+        <div class="auth-page__feature-list">
+          <div><strong>Perfil completo</strong><span>Nacionalidad, idioma, documento y preferencias del viaje.</span></div>
+          <div><strong>Todo listo para tu estancia</strong><span>Al terminar podras revisar tu cuenta y continuar con tu reserva.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="auth-page__panel surface">
+      <div class="surface__header">
+        <div>
+          <span class="eyebrow">Crear cuenta</span>
+          <h2 class="title-md">Datos del huesped</h2>
+          <p>Completa la informacion basica y las preferencias principales.</p>
+        </div>
+      </div>
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-grid form-grid--2">
+          <div class="field-group" [class.invalid]="isInvalid('nombre')" [class.valid]="isValid('nombre')">
+            <label for="registerNombre">Nombre</label>
+            <input id="registerNombre" type="text" formControlName="nombre" />
+          </div>
+          <div class="field-group" [class.invalid]="isInvalid('apellido')" [class.valid]="isValid('apellido')">
+            <label for="registerApellido">Apellido</label>
+            <input id="registerApellido" type="text" formControlName="apellido" />
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="field-group" [class.invalid]="isInvalid('email')" [class.valid]="isValid('email')">
+            <label for="registerEmail">Correo</label>
+            <input id="registerEmail" type="email" formControlName="email" />
+          </div>
+          <div class="field-group" [class.invalid]="isInvalid('telefono')" [class.valid]="isValid('telefono')">
+            <label for="registerTelefono">Telefono</label>
+            <input id="registerTelefono" type="text" formControlName="telefono" />
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="field-group" [class.invalid]="isInvalid('password')" [class.valid]="isValid('password')">
+            <label for="registerPassword">Contrasena</label>
+            <input id="registerPassword" type="password" formControlName="password" />
+          </div>
+          <div class="field-group" [class.invalid]="isInvalid('confirmPassword')" [class.valid]="isValid('confirmPassword')">
+            <label for="registerConfirmPassword">Confirmar contrasena</label>
+            <input id="registerConfirmPassword" type="password" formControlName="confirmPassword" />
+            @if (form.errors?.['passwordMismatch'] && form.touched) {
+              <span class="error-text">Las contrasenas no coinciden.</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="field-group" [class.invalid]="isInvalid('nacionalidad')" [class.valid]="isValid('nacionalidad')">
+            <label for="registerNacionalidad">Nacionalidad</label>
+            <input id="registerNacionalidad" type="text" formControlName="nacionalidad" />
+          </div>
+          <div class="field-group" [class.invalid]="isInvalid('documentoIdentidad')" [class.valid]="isValid('documentoIdentidad')">
+            <label for="registerDocumento">Documento</label>
+            <input id="registerDocumento" type="text" formControlName="documentoIdentidad" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="registerIdioma">Idioma</label>
+          <select id="registerIdioma" formControlName="idioma">
+            <option value="ES">Espanol</option>
+            <option value="EN">English</option>
+            <option value="FR">Francais</option>
+          </select>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="field-group">
+            <label for="registerAlergias">Alergias</label>
+            <input id="registerAlergias" type="text" formControlName="alergias" />
+          </div>
+          <div class="field-group">
+            <label for="registerPreferenciasCama">Preferencias de cama</label>
+            <input id="registerPreferenciasCama" type="text" formControlName="preferenciasCama" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="registerPeticiones">Peticiones especiales</label>
+          <textarea id="registerPeticiones" formControlName="peticionesEspeciales"></textarea>
+        </div>
+
+        <label class="auth-page__checkbox">
+          <input type="checkbox" formControlName="terms" />
+          <span>Acepto el tratamiento de datos para gestionar mi estancia.</span>
+        </label>
+
+        @if (isInvalid('terms')) {
+          <span class="error-text">Debes aceptar los terminos para continuar.</span>
+        }
+
+        <button class="primary-button" type="submit" [disabled]="loading()">
+          {{ loading() ? 'Creando cuenta...' : 'Crear cuenta' }}
+        </button>
+      </form>
+
+      <div class="auth-page__footer">
+        <span>Ya tienes acceso?</span>
+        <a routerLink="/auth/login">Iniciar sesion</a>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,165 @@
+<div class="guest-dashboard">
+  <header class="guest-dashboard__header">
+    <div>
+      <span class="eyebrow">Mi cuenta</span>
+      <h1 class="title-lg">Hola{{ profile()?.nombre ? ', ' + profile()?.nombre : '' }}</h1>
+      <p class="text-muted">Desde aqui puedes revisar tu estancia, reservas, mesa, servicios y datos personales.</p>
+    </div>
+    <a class="primary-button" routerLink="/concierge">Abrir concierge</a>
+  </header>
+
+  @if (loading()) {
+    <app-loading-skeleton [count]="4" cardHeight="16rem"></app-loading-skeleton>
+  } @else {
+    <section class="metric-grid">
+      <article class="metric-card">
+        <span>Reservas</span>
+        <strong>{{ reservations().length }}</strong>
+        <p>Total registrado en tu cuenta.</p>
+      </article>
+      <article class="metric-card">
+        <span>Servicios</span>
+        <strong>{{ pendingServices().length }}</strong>
+        <p>Solicitudes activas o pendientes.</p>
+      </article>
+      <article class="metric-card">
+        <span>Restaurante</span>
+        <strong>{{ upcomingRestaurant().length }}</strong>
+        <p>Mesas confirmadas proximas.</p>
+      </article>
+      <article class="metric-card">
+        <span>Perfil</span>
+        <strong>{{ profile()?.idioma ?? 'ES' }}</strong>
+        <p>{{ profile()?.email ?? 'Sin correo' }}</p>
+      </article>
+    </section>
+
+    <section class="guest-dashboard__actions">
+      @for (action of quickActions; track action.route) {
+        <a class="guest-dashboard__action surface" [routerLink]="action.route">
+          <strong>{{ action.label }}</strong>
+          <span>Entrar</span>
+        </a>
+      }
+    </section>
+
+    <section class="split-grid">
+      <article class="surface guest-dashboard__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Estancia activa</h2>
+            <p>La reserva que necesita tu atencion primero.</p>
+          </div>
+          <a class="ghost-button" routerLink="/mi-cuenta/reservas">Ver todo</a>
+        </div>
+
+        @if (activeReservation(); as reservation) {
+          <div class="guest-dashboard__reservation">
+            <div class="guest-dashboard__reservation-top">
+              <div>
+                <strong>{{ reservation.codigoReserva }}</strong>
+                <span>{{ getRoomTypeLabel(reservation.roomTipo) }} · Habitacion {{ reservation.roomNumero }}</span>
+              </div>
+              <app-status-badge [status]="reservation.estado"></app-status-badge>
+            </div>
+            <div class="info-pairs">
+              <div>
+                <strong>Check-in</strong>
+                <span>{{ formatDate(reservation.checkIn) }}</span>
+              </div>
+              <div>
+                <strong>Check-out</strong>
+                <span>{{ formatDate(reservation.checkOut) }}</span>
+              </div>
+              <div>
+                <strong>Noches</strong>
+                <span>{{ reservation.cantidadNoches }}</span>
+              </div>
+              <div>
+                <strong>Total</strong>
+                <span>{{ currency(reservation.precioTotal) }}</span>
+              </div>
+            </div>
+          </div>
+        } @else if (nextCheckIn(); as upcoming) {
+          <div class="guest-dashboard__reservation">
+            <strong>Tu siguiente estancia esta confirmada.</strong>
+            <p class="text-muted">Entrada {{ formatDate(upcoming.checkIn) }} · Habitacion {{ upcoming.roomNumero }}</p>
+          </div>
+        } @else {
+          <div class="empty-state">
+            <strong>No tienes una estancia activa.</strong>
+            <p>Cuando reserves una habitacion aparecera aqui.</p>
+          </div>
+        }
+      </article>
+
+      <article class="surface guest-dashboard__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Solicitudes de servicio</h2>
+            <p>Seguimiento rapido de tus pedidos mas recientes.</p>
+          </div>
+          <a class="ghost-button" routerLink="/mi-cuenta/servicios">Solicitar</a>
+        </div>
+
+        @if (!pendingServices().length) {
+          <div class="empty-state">
+            <strong>No hay solicitudes pendientes.</strong>
+            <p>El estado de tus servicios aparecera aqui.</p>
+          </div>
+        } @else {
+          <div class="list-rows">
+            @for (request of pendingServices().slice(0, 4); track request.id) {
+              <div class="list-row">
+                <div class="list-row__top">
+                  <div>
+                    <strong>{{ request.serviceNombre }}</strong>
+                    <span>{{ formatDate(request.fechaSolicitada) }} · {{ formatTime(request.horaSolicitada) }}</span>
+                  </div>
+                  <app-status-badge [status]="request.estado"></app-status-badge>
+                </div>
+                <span class="text-soft">{{ currency(request.precioAplicado) }}</span>
+              </div>
+            }
+          </div>
+        }
+      </article>
+    </section>
+
+    <section class="surface guest-dashboard__panel">
+      <div class="surface__header">
+        <div>
+          <h2>Proximas reservas de restaurante</h2>
+          <p>Mesas confirmadas ligadas o no a tu estancia.</p>
+        </div>
+        <a class="ghost-button" routerLink="/mi-cuenta/restaurante">Gestionar</a>
+      </div>
+
+      @if (!upcomingRestaurant().length) {
+        <div class="empty-state">
+          <strong>No tienes reservas de restaurante confirmadas.</strong>
+          <p>Reserva una mesa desde la seccion de restaurante.</p>
+        </div>
+      } @else {
+        <div class="guest-dashboard__restaurant-grid">
+          @for (reservation of upcomingRestaurant(); track reservation.id) {
+            <article class="list-row">
+              <div class="list-row__top">
+                <div>
+                  <strong>Mesa {{ reservation.tableNumero }}</strong>
+                  <span>{{ formatDate(reservation.fecha) }} · {{ formatTime(reservation.hora) }}</span>
+                </div>
+                <app-status-badge [status]="reservation.estado"></app-status-badge>
+              </div>
+              <div class="list-row__meta">
+                <span>{{ reservation.cantidadPersonas }} personas</span>
+                <span>{{ reservation.ocasionEspecial }}</span>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>

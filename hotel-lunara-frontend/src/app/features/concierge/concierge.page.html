@@ -1,0 +1,100 @@
+<div class="concierge-page">
+  <header class="concierge-page__header">
+    <div>
+      <span class="eyebrow">Concierge IA</span>
+      <h1 class="title-lg">Conversacion enfocada en acciones utiles</h1>
+      <p class="text-muted">Chat limpio, historial reciente y accesos rapidos a restaurante, servicios y cuenta.</p>
+    </div>
+    <button class="ghost-button concierge-page__sidebar-toggle" type="button" (click)="toggleSidebar()">
+      Ver detalles
+    </button>
+  </header>
+
+  <div class="concierge-page__layout">
+    <section class="concierge-page__chat surface">
+      <div class="concierge-page__chat-top">
+        <div>
+          <strong>Asistente del hotel</strong>
+          <span>{{ authService.isLoggedIn() ? 'Con tu cuenta' : 'Sin iniciar sesion' }}</span>
+        </div>
+      </div>
+
+      <div #viewport class="concierge-page__messages">
+        @if (loading()) {
+          <app-loading-skeleton [count]="3" cardHeight="7rem"></app-loading-skeleton>
+        } @else if (!messages().length) {
+          <div class="empty-state">
+            <strong>Empieza una conversacion.</strong>
+            <p>Puedes pedir una mesa, un servicio o ayuda con tu reserva.</p>
+          </div>
+        } @else {
+          @for (message of messages(); track message.id) {
+            <article class="concierge-page__bubble" [ngClass]="message.role === 'USER' ? 'is-user' : 'is-assistant'">
+              <div class="concierge-page__bubble-top">
+                <strong>{{ message.role === 'USER' ? 'Tu' : 'Concierge' }}</strong>
+                <span>{{ formatTime(message.timestamp.slice(11, 16)) }}</span>
+              </div>
+              <p>{{ message.content }}</p>
+              @if (message.role === 'ASSISTANT' && message.actionSuggested && message.actionSuggested !== 'NONE') {
+                <button class="ghost-button" type="button" (click)="handleAction(message.actionSuggested)">
+                  {{ actionLabel(message.actionSuggested) }}
+                </button>
+              }
+            </article>
+          }
+        }
+      </div>
+
+      <form class="concierge-page__composer" [formGroup]="form" (ngSubmit)="sendMessage()">
+        <div class="field-group">
+          <label for="conciergeMessage">Mensaje</label>
+          <textarea id="conciergeMessage" formControlName="message" placeholder="Escribe una solicitud o pregunta concreta"></textarea>
+        </div>
+        <button class="primary-button" type="submit" [disabled]="sending()">
+          {{ sending() ? 'Enviando...' : 'Enviar mensaje' }}
+        </button>
+      </form>
+    </section>
+
+    <aside class="concierge-page__sidebar surface" [class.open]="sidebarOpen()">
+      <div class="surface__header">
+        <div>
+          <h2>Contexto</h2>
+          <p>Accesos y referencias cercanas a la conversacion.</p>
+        </div>
+      </div>
+
+      @if (currentStay(); as stay) {
+        <div class="concierge-page__context-block">
+          <strong>Estancia actual</strong>
+          <span>{{ stay.codigoReserva }} · Habitacion {{ stay.roomNumero }}</span>
+          <span>{{ formatDate(stay.checkIn) }} - {{ formatDate(stay.checkOut) }}</span>
+        </div>
+      }
+
+      <div class="concierge-page__context-block">
+        <strong>Acciones rapidas</strong>
+        <div class="actions-row">
+          <button class="ghost-button" type="button" (click)="handleAction('BOOK_RESTAURANT')">Reservar mesa</button>
+          <button class="ghost-button" type="button" (click)="handleAction('REQUEST_SERVICE')">Solicitar servicio</button>
+        </div>
+      </div>
+
+      <div class="concierge-page__context-block">
+        <strong>Respuestas recientes</strong>
+        @if (!historyPreview().length) {
+          <p class="text-soft">Aun no hay respuestas del asistente.</p>
+        } @else {
+          <div class="list-rows">
+            @for (item of historyPreview(); track item.id) {
+              <div class="list-row">
+                <strong>{{ formatDate(item.timestamp, { month: 'short', day: 'numeric' }) }}</strong>
+                <p>{{ item.content }}</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </aside>
+  </div>
+</div>

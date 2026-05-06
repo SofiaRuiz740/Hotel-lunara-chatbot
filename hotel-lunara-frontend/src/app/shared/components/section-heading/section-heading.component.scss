@@ -1,0 +1,34 @@
+.sec-heading {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.sec-heading.centered {
+  justify-items: center;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.sec-heading__eyebrow {
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+}
+
+.sec-heading__title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.sec-heading__sub {
+  margin: 0.1rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}

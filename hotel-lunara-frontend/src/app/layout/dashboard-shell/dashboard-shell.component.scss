@@ -1,0 +1,230 @@
+.dashboard-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 18.5rem minmax(0, 1fr);
+  background:
+    radial-gradient(circle at top left, rgba(184, 138, 86, 0.08), transparent 25%),
+    var(--color-bg);
+}
+
+.dashboard-shell__backdrop {
+  display: none;
+}
+
+.dashboard-shell__sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  padding: 1.4rem;
+  background: rgba(255, 255, 255, 0.92);
+  border-right: 1px solid var(--color-border);
+  backdrop-filter: blur(16px);
+}
+
+.dashboard-shell__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.dashboard-shell__brand-mark {
+  width: 2.7rem;
+  height: 2.7rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-lg);
+  color: white;
+  background: linear-gradient(135deg, var(--color-secondary), #255d6b);
+}
+
+.dashboard-shell__brand-mark svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.dashboard-shell__brand strong,
+.dashboard-shell__topbar-copy strong,
+.dashboard-shell__user strong {
+  display: block;
+}
+
+.dashboard-shell__brand span,
+.dashboard-shell__topbar-copy span,
+.dashboard-shell__user span {
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.dashboard-shell__intro {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid rgba(29, 73, 84, 0.12);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(29, 73, 84, 0.08), rgba(184, 138, 86, 0.08));
+}
+
+.dashboard-shell__intro strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.dashboard-shell__intro p {
+  color: var(--color-text-secondary);
+}
+
+.dashboard-shell__nav {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.dashboard-shell__nav-link,
+.dashboard-shell__footer-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 2.6rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.dashboard-shell__nav-link:hover,
+.dashboard-shell__nav-link.active {
+  color: var(--color-text-primary);
+  background: rgba(21, 35, 42, 0.05);
+}
+
+.dashboard-shell__nav-link.active {
+  border: 1px solid rgba(21, 35, 42, 0.08);
+  box-shadow: var(--shadow-xs);
+}
+
+.dashboard-shell__nav-icon,
+.dashboard-shell__footer-link span,
+.dashboard-shell__footer-link svg {
+  width: 1rem;
+  height: 1rem;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.dashboard-shell__sidebar-footer {
+  margin-top: auto;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.dashboard-shell__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-shell__topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: rgba(244, 246, 247, 0.86);
+  border-bottom: 1px solid rgba(21, 35, 42, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.dashboard-shell__menu-button {
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.dashboard-shell__menu-button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.dashboard-shell__topbar-copy {
+  margin-right: auto;
+}
+
+.dashboard-shell__user {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.dashboard-shell__user-avatar {
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  font-weight: 700;
+}
+
+.dashboard-shell__viewport {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+@media (max-width: 1080px) {
+  .dashboard-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-shell__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: block;
+    border: 0;
+    background: rgba(15, 23, 31, 0.38);
+  }
+
+  .dashboard-shell__sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: min(20rem, 86vw);
+    height: auto;
+    z-index: 80;
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+    box-shadow: var(--shadow-md);
+  }
+
+  .dashboard-shell__sidebar.open {
+    transform: translateX(0);
+  }
+
+  .dashboard-shell__menu-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .dashboard-shell__topbar-copy {
+    display: none;
+  }
+
+  .dashboard-shell__viewport,
+  .dashboard-shell__topbar {
+    padding-inline: 1rem;
+  }
+}

@@ -1,0 +1,58 @@
+<div class="auth-page">
+  <div class="auth-page__layout page-container page-block">
+    <section class="auth-page__visual surface--strong">
+      <div class="auth-page__visual-image" [style.background-image]="'linear-gradient(180deg, rgba(8, 15, 18, 0.18), rgba(8, 15, 18, 0.65)), url(' + authImage + ')'"></div>
+      <div class="auth-page__visual-copy">
+        <span class="eyebrow">Acceso</span>
+        <h1 class="title-lg">Bienvenido de nuevo</h1>
+        <p>Inicia sesion para continuar tu reserva, hablar con concierge o revisar tu cuenta.</p>
+        <div class="auth-page__feature-list">
+          <div><strong>Acceso rapido</strong><span>Puedes mantener tu sesion en este dispositivo si lo prefieres.</span></div>
+          <div><strong>Todo en un solo lugar</strong><span>Despues de entrar veras directamente tu espacio dentro del hotel.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="auth-page__panel surface">
+      <div class="surface__header">
+        <div>
+          <span class="eyebrow">Iniciar sesion</span>
+          <h2 class="title-md">Accede a tu espacio</h2>
+          <p>Usa tu correo registrado y tu clave actual.</p>
+        </div>
+      </div>
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="field-group" [class.invalid]="isInvalid('email')" [class.valid]="isValid('email')">
+          <label for="loginEmail">Correo</label>
+          <input id="loginEmail" type="email" formControlName="email" placeholder="tu@correo.com" />
+          @if (isInvalid('email')) {
+            <span class="error-text">Ingresa un correo valido.</span>
+          }
+        </div>
+
+        <div class="field-group" [class.invalid]="isInvalid('password')" [class.valid]="isValid('password')">
+          <label for="loginPassword">Contrasena</label>
+          <input id="loginPassword" type="password" formControlName="password" placeholder="Minimo 8 caracteres" />
+          @if (isInvalid('password')) {
+            <span class="error-text">La contrasena debe tener al menos 8 caracteres.</span>
+          }
+        </div>
+
+        <label class="auth-page__checkbox">
+          <input type="checkbox" formControlName="rememberMe" />
+          <span>Recordar sesion en este dispositivo</span>
+        </label>
+
+        <button class="primary-button" type="submit" [disabled]="loading()">
+          {{ loading() ? 'Ingresando...' : 'Ingresar' }}
+        </button>
+      </form>
+
+      <div class="auth-page__footer">
+        <span>No tienes cuenta todavia?</span>
+        <a routerLink="/auth/registro">Crear cuenta</a>
+      </div>
+    </section>
+  </div>
+</div>

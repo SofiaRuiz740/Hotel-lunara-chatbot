@@ -1,0 +1,114 @@
+.concierge-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.concierge-page__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.concierge-page__layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.3fr) minmax(18rem, 0.7fr);
+}
+
+.concierge-page__chat,
+.concierge-page__sidebar {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  align-content: start;
+}
+
+.concierge-page__chat-top span,
+.concierge-page__bubble span {
+  color: var(--color-text-secondary);
+}
+
+.concierge-page__messages {
+  display: grid;
+  gap: 0.9rem;
+  min-height: 32rem;
+  max-height: 32rem;
+  overflow: auto;
+}
+
+.concierge-page__bubble {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 80%;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+}
+
+.concierge-page__bubble.is-user {
+  justify-self: end;
+  background: var(--color-secondary);
+  color: white;
+}
+
+.concierge-page__bubble.is-user span {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.concierge-page__bubble.is-assistant {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+}
+
+.concierge-page__bubble-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.concierge-page__composer {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.concierge-page__composer textarea {
+  min-height: 8rem;
+}
+
+.concierge-page__context-block {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.concierge-page__sidebar-toggle {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .concierge-page__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .concierge-page__sidebar-toggle {
+    display: inline-flex;
+  }
+
+  .concierge-page__sidebar {
+    display: none;
+  }
+
+  .concierge-page__sidebar.open {
+    display: grid;
+  }
+}
+
+@media (max-width: 720px) {
+  .concierge-page__header,
+  .concierge-page__bubble-top {
+    flex-direction: column;
+  }
+
+  .concierge-page__bubble {
+    max-width: 100%;
+  }
+}

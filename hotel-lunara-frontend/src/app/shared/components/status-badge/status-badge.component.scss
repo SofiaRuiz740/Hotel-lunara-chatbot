@@ -1,0 +1,38 @@
+.status-confirmada,
+.status-pendiente {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border-color: rgba(180, 122, 55, 0.22);
+}
+
+.status-activa,
+.status-confirmado,
+.status-en_proceso,
+.status-disponible,
+.status-ocupada {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border-color: rgba(43, 122, 98, 0.22);
+}
+
+.status-completada,
+.status-completado {
+  background: rgba(21, 35, 42, 0.06);
+  color: var(--color-text-secondary);
+  border-color: rgba(21, 35, 42, 0.12);
+}
+
+.status-cancelada,
+.status-cancelado,
+.status-no_show,
+.status-mantenimiento {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border-color: rgba(194, 77, 59, 0.22);
+}
+
+.status-limpieza {
+  background: rgba(184, 138, 86, 0.14);
+  color: var(--color-primary-strong);
+  border-color: rgba(184, 138, 86, 0.24);
+}

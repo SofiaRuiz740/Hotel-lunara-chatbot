@@ -1,0 +1,28 @@
+.skeleton-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.skeleton-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(238, 242, 243, 0.9));
+}
+
+.skeleton-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.82) 50%, transparent 100%);
+  animation: skeleton-wave 1.35s infinite;
+}
+
+@keyframes skeleton-wave {
+  100% {
+    transform: translateX(100%);
+  }
+}

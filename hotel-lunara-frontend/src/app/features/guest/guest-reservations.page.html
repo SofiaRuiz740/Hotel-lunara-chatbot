@@ -1,0 +1,82 @@
+<div class="guest-reservations">
+  <header class="guest-reservations__header">
+    <div>
+      <span class="eyebrow">Reservas</span>
+      <h1 class="title-lg">Historial y seguimiento de tus estancias</h1>
+      <p class="text-muted">Consulta estado, fechas, valores y cancelaciones desde una sola vista.</p>
+    </div>
+  </header>
+
+  <div class="segmented-control">
+    @for (tab of tabs; track tab) {
+      <button type="button" [class.active]="activeTab() === tab" (click)="setTab(tab)">
+        {{ tab | titlecase }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [count]="3" cardHeight="18rem"></app-loading-skeleton>
+  } @else if (!filteredReservations().length) {
+    <div class="empty-state">
+      <strong>No hay reservas en esta categoria.</strong>
+      <p>Cambia de pestaña para revisar otros estados.</p>
+    </div>
+  } @else {
+    <div class="list-rows">
+      @for (reservation of filteredReservations(); track reservation.id) {
+        <article class="list-row">
+          <div class="list-row__top">
+            <div>
+              <strong>{{ reservation.codigoReserva }}</strong>
+              <span>{{ getRoomTypeLabel(reservation.roomTipo) }} · Habitacion {{ reservation.roomNumero }}</span>
+            </div>
+            <app-status-badge [status]="reservation.estado"></app-status-badge>
+          </div>
+
+          <div class="list-row__meta">
+            <span>{{ formatDate(reservation.checkIn) }} - {{ formatDate(reservation.checkOut) }}</span>
+            <span>{{ reservation.cantidadAdultos }} adultos · {{ reservation.cantidadNinos }} ninos</span>
+            <span>{{ currency(reservation.precioTotal) }}</span>
+          </div>
+
+          @if (reservation.peticionesEspeciales) {
+            <p class="text-soft">{{ reservation.peticionesEspeciales }}</p>
+          }
+
+          @if (reservation.estado === 'CONFIRMADA') {
+            <div class="actions-row">
+              <button class="danger-button" type="button" (click)="openCancelModal(reservation)">Cancelar reserva</button>
+            </div>
+          }
+        </article>
+      }
+    </div>
+  }
+
+  @if (reservationToCancel(); as selectedReservation) {
+    <app-modal-shell (closed)="closeCancelModal()">
+      <div class="guest-reservations__modal">
+        <div class="surface__header">
+          <div>
+            <h2>Cancelar reserva</h2>
+            <p>{{ selectedReservation.codigoReserva }} · {{ formatDate(selectedReservation.checkIn) }}</p>
+          </div>
+        </div>
+
+        <form class="form-grid" [formGroup]="cancelForm" (ngSubmit)="confirmCancellation()">
+          <div class="field-group">
+            <label for="cancelReason">Motivo</label>
+            <textarea id="cancelReason" formControlName="motivo"></textarea>
+          </div>
+          <div class="actions-row">
+            <button class="danger-button" type="submit" [disabled]="cancelling()">
+              {{ cancelling() ? 'Cancelando...' : 'Confirmar cancelacion' }}
+            </button>
+            <button class="ghost-button" type="button" (click)="closeCancelModal()">Volver</button>
+          </div>
+        </form>
+      </div>
+    </app-modal-shell>
+  }
+</div>

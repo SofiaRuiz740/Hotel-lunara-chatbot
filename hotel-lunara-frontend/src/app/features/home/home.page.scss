@@ -1,0 +1,212 @@
+.home-page {
+  display: grid;
+  gap: 0;
+}
+
+.home-page__hero {
+  position: relative;
+  min-height: calc(100vh - 5rem);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.home-page__hero-media {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.home-page__hero-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(22rem, 0.8fr);
+  align-items: end;
+  gap: 2rem;
+  padding-block: clamp(5rem, 10vw, 7rem) 3rem;
+}
+
+.home-page__hero-copy {
+  display: grid;
+  gap: 1rem;
+  max-width: 44rem;
+  color: white;
+}
+
+.home-page__hero-copy .eyebrow,
+.home-page__hero-copy .text-muted {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.home-page__hero-copy .eyebrow::before {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.home-page__hero-side {
+  padding: 1.3rem;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.home-page__hero-notes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.home-page__hero-notes div {
+  display: grid;
+  gap: 0.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.home-page__section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.home-page__room-grid,
+.home-page__service-grid,
+.home-page__testimonial-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.home-page__room-card,
+.home-page__service-card,
+.home-page__testimonial,
+.home-page__experience-copy,
+.home-page__experience-media,
+.home-page__contact-copy,
+.home-page__map {
+  overflow: hidden;
+}
+
+.home-page__room-media,
+.home-page__experience-image {
+  min-height: 15rem;
+  background-size: cover;
+  background-position: center;
+}
+
+.home-page__room-body,
+.home-page__service-card,
+.home-page__testimonial,
+.home-page__contact-copy {
+  padding: 1.2rem;
+}
+
+.home-page__room-body {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.home-page__room-top,
+.home-page__room-footer,
+.home-page__service-top,
+.home-page__testimonial-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.home-page__room-top span,
+.home-page__service-meta,
+.home-page__testimonial span {
+  color: var(--color-text-secondary);
+}
+
+.home-page__room-footer strong,
+.home-page__service-top strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.home-page__service-card {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.home-page__service-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+}
+
+.home-page__experience-copy {
+  padding: 1.35rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.home-page__experience-media {
+  padding: 0;
+}
+
+.home-page__testimonial {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.home-page__testimonial-top img {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.home-page__map {
+  padding: 0;
+}
+
+.home-page__map iframe {
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@media (max-width: 1080px) {
+  .home-page__hero-content,
+  .home-page__room-grid,
+  .home-page__service-grid,
+  .home-page__testimonial-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .home-page__hero-content {
+    align-items: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-page__hero {
+    min-height: auto;
+  }
+
+  .home-page__hero-content,
+  .home-page__room-grid,
+  .home-page__service-grid,
+  .home-page__testimonial-grid,
+  .home-page__hero-notes {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page__section-head,
+  .home-page__room-top,
+  .home-page__room-footer,
+  .home-page__service-top,
+  .home-page__testimonial-top {
+    flex-direction: column;
+  }
+}

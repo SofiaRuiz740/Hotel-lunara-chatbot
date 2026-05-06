@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.hotellunara.reservation.ReservationServiceTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.445 s -- in com.hotellunara.reservation.ReservationServiceTest

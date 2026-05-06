@@ -1,0 +1,63 @@
+.toast-stack {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 1200;
+  display: grid;
+  gap: 0.75rem;
+  width: min(24rem, calc(100vw - 2rem));
+}
+
+.toast-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.8rem;
+  align-items: start;
+  padding: 0.95rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(21, 35, 42, 0.08);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(18px);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.toast-card__indicator {
+  width: 0.3rem;
+  min-height: 100%;
+  border-radius: 999px;
+  background: var(--color-secondary);
+}
+
+.toast-card__content {
+  display: grid;
+  gap: 0.24rem;
+}
+
+.toast-card__content p {
+  color: var(--color-text-secondary);
+}
+
+.toast-card button {
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  padding: 0;
+}
+
+.toast-card button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.toast-card.success .toast-card__indicator {
+  background: var(--color-success);
+}
+
+.toast-card.error .toast-card__indicator {
+  background: var(--color-error);
+}
+
+.toast-card.warning .toast-card__indicator {
+  background: var(--color-warning);
+}

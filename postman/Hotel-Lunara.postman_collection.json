@@ -1,0 +1,1016 @@
+{
+  "info": {
+    "_postman_id": "d44f7ef1-a8aa-4df4-a9f4-457da43b57b9",
+    "name": "Hotel Lunara",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleccion de pruebas funcionales para Hotel Lunara."
+  },
+  "item": [
+    {
+      "name": "01 - Public",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/actuator/health"
+          }
+        },
+        {
+          "name": "Get Hotel Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/hotel/info"
+          }
+        },
+        {
+          "name": "List Rooms",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.length > 0) {",
+                  "  pm.environment.set('roomId', json.data[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/rooms"
+          }
+        },
+        {
+          "name": "Room Availability",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const checkIn = new Date();",
+                  "checkIn.setDate(checkIn.getDate() + 7);",
+                  "const checkOut = new Date(checkIn);",
+                  "checkOut.setDate(checkOut.getDate() + 2);",
+                  "const formatDate = (value) => value.toISOString().slice(0, 10);",
+                  "pm.environment.set('publicCheckInDate', formatDate(checkIn));",
+                  "pm.environment.set('publicCheckOutDate', formatDate(checkOut));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/rooms/availability?checkIn={{publicCheckInDate}}&checkOut={{publicCheckOutDate}}&adults=2&children=0&type=DOBLE"
+          }
+        },
+        {
+          "name": "List Services",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.length > 0) {",
+                  "  pm.environment.set('serviceId', json.data[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/services"
+          }
+        },
+        {
+          "name": "Service Availability",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const serviceDate = new Date();",
+                  "serviceDate.setDate(serviceDate.getDate() + 10);",
+                  "pm.environment.set('publicServiceDate', serviceDate.toISOString().slice(0, 10));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/services/{{serviceId}}/availability?fecha={{publicServiceDate}}&hora=09:00"
+          }
+        },
+        {
+          "name": "Restaurant Availability",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const restaurantDate = new Date();",
+                  "restaurantDate.setDate(restaurantDate.getDate() + 5);",
+                  "pm.environment.set('publicRestaurantDate', restaurantDate.toISOString().slice(0, 10));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/restaurant/availability?fecha={{publicRestaurantDate}}&hora=19:30&personas=2"
+          }
+        },
+        {
+          "name": "Anonymous Concierge Chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.sessionToken) {",
+                  "  pm.environment.set('sessionToken', json.data.sessionToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mensaje\": \"Hola, ¿cuáles son los horarios del restaurante?\",\n  \"sessionToken\": \"{{sessionToken}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/concierge/chat"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Auth",
+      "item": [
+        {
+          "name": "Register Guest",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Invitado\",\n  \"apellido\": \"Nuevo\",\n  \"email\": \"guest{{$timestamp}}@hotellunara.com\",\n  \"password\": \"Guest1234!\",\n  \"telefono\": \"+57 3000000000\",\n  \"nacionalidad\": \"CO\",\n  \"documentoIdentidad\": \"CC-{{$timestamp}}\",\n  \"idioma\": \"ES\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login Guest",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.environment.set('guestToken', json.data.accessToken);",
+                  "pm.environment.set('guestRefreshToken', json.data.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{guestEmail}}\",\n  \"password\": \"{{guestPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login Receptionist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.environment.set('receptionistToken', json.data.accessToken);",
+                  "pm.environment.set('receptionistRefreshToken', json.data.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{receptionistEmail}}\",\n  \"password\": \"{{receptionistPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.environment.set('adminToken', json.data.accessToken);",
+                  "pm.environment.set('adminRefreshToken', json.data.refreshToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Refresh Guest Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{guestRefreshToken}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/refresh"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Guest",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users/me"
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Huesped\",\n  \"apellido\": \"Demo\",\n  \"telefono\": \"+57 3111111111\",\n  \"nacionalidad\": \"CO\",\n  \"documentoIdentidad\": \"CC-123456\",\n  \"idioma\": \"ES\",\n  \"alergias\": \"Nueces\",\n  \"preferenciasCama\": \"King\",\n  \"peticionesEspeciales\": \"Habitacion silenciosa\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/me"
+          }
+        },
+        {
+          "name": "Authenticated Concierge Chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.sessionToken) {",
+                  "  pm.environment.set('sessionToken', json.data.sessionToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mensaje\": \"¿Qué servicios tengo disponibles y cuál es mi configuración de huésped?\",\n  \"sessionToken\": \"{{sessionToken}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/concierge/chat"
+          }
+        },
+        {
+          "name": "Get Concierge History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/concierge/history"
+          }
+        },
+        {
+          "name": "Create Room Reservation",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const checkIn = new Date();",
+                  "checkIn.setDate(checkIn.getDate() + 1);",
+                  "const checkOut = new Date(checkIn);",
+                  "checkOut.setDate(checkOut.getDate() + 2);",
+                  "const formatDate = (value) => value.toISOString().slice(0, 10);",
+                  "pm.environment.set('reservationCheckInDate', formatDate(checkIn));",
+                  "pm.environment.set('reservationCheckOutDate', formatDate(checkOut));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) {",
+                  "  pm.environment.set('reservationId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": {{roomId}},\n  \"checkIn\": \"{{reservationCheckInDate}}\",\n  \"checkOut\": \"{{reservationCheckOutDate}}\",\n  \"cantidadAdultos\": 1,\n  \"cantidadNinos\": 0,\n  \"peticionesEspeciales\": \"Llegada tarde\"\n}"
+            },
+            "url": "{{baseUrl}}/api/reservations"
+          }
+        },
+        {
+          "name": "Get My Reservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservations/me"
+          }
+        },
+        {
+          "name": "Create Restaurant Reservation",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const date = new Date();",
+                  "date.setDate(date.getDate() + 2);",
+                  "pm.environment.set('restaurantDate', date.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) {",
+                  "  pm.environment.set('restaurantReservationId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{restaurantDate}}\",\n  \"hora\": \"19:30\",\n  \"cantidadPersonas\": 2,\n  \"ocasionEspecial\": \"ANIVERSARIO\",\n  \"peticiones\": \"Mesa tranquila\"\n}"
+            },
+            "url": "{{baseUrl}}/api/restaurant/reservations"
+          }
+        },
+        {
+          "name": "Get My Restaurant Reservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/restaurant/reservations/me"
+          }
+        },
+        {
+          "name": "Create Service Request",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const date = new Date();",
+                  "date.setDate(date.getDate() + 3);",
+                  "pm.environment.set('serviceDate', date.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) {",
+                  "  pm.environment.set('serviceRequestId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"serviceId\": {{serviceId}},\n  \"fechaSolicitada\": \"{{serviceDate}}\",\n  \"horaSolicitada\": \"09:00\",\n  \"notas\": \"Prueba de servicio\"\n}"
+            },
+            "url": "{{baseUrl}}/api/service-requests"
+          }
+        },
+        {
+          "name": "Get My Service Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/service-requests/me"
+          }
+        },
+        {
+          "name": "Cancel Restaurant Reservation",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/restaurant/reservations/{{restaurantReservationId}}/cancel"
+          }
+        },
+        {
+          "name": "Cancel Room Reservation",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{guestToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Cambio de plan\"\n}"
+            },
+            "url": "{{baseUrl}}/api/reservations/{{reservationId}}/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Receptionist",
+      "item": [
+        {
+          "name": "List All Reservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservations?status=CONFIRMADA&guestQuery=huesped"
+          }
+        },
+        {
+          "name": "Today Operations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservations/today-operations"
+          }
+        },
+        {
+          "name": "Check-in Reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservations/{{reservationId}}/checkin"
+          }
+        },
+        {
+          "name": "Check-out Reservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reservations/{{reservationId}}/checkout"
+          }
+        },
+        {
+          "name": "List Restaurant Reservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/restaurant/reservations?status=CONFIRMADA"
+          }
+        },
+        {
+          "name": "Update Restaurant Reservation Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"COMPLETADA\"\n}"
+            },
+            "url": "{{baseUrl}}/api/restaurant/reservations/{{restaurantReservationId}}/status"
+          }
+        },
+        {
+          "name": "List Service Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/service-requests?status=PENDIENTE"
+          }
+        },
+        {
+          "name": "Update Service Request Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"CONFIRMADO\"\n}"
+            },
+            "url": "{{baseUrl}}/api/service-requests/{{serviceRequestId}}/status"
+          }
+        },
+        {
+          "name": "Change Room Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{receptionistToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/rooms/{{roomId}}/status?status=LIMPIEZA"
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Admin",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/dashboard"
+          }
+        },
+        {
+          "name": "Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/audit-logs"
+          }
+        },
+        {
+          "name": "List Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.length > 0) {",
+                  "  const guest = json.data.find(user => user.role === 'GUEST');",
+                  "  if (guest) { pm.environment.set('userId', guest.id); }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/admin/users"
+          }
+        },
+        {
+          "name": "Create Receptionist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) {",
+                  "  pm.environment.set('createdReceptionistUserId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Recep\",\n  \"apellido\": \"Nueva\",\n  \"email\": \"recep{{$timestamp}}@hotellunara.com\",\n  \"password\": \"Recep1234!\",\n  \"telefono\": \"+57 3222222222\",\n  \"nacionalidad\": \"CO\",\n  \"documentoIdentidad\": \"EMP-{{$timestamp}}\",\n  \"idioma\": \"ES\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/receptionists"
+          }
+        },
+        {
+          "name": "Change User Role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/users/{{createdReceptionistUserId}}/role"
+          }
+        },
+        {
+          "name": "Change User Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/admin/users/{{createdReceptionistUserId}}/status"
+          }
+        },
+        {
+          "name": "Create Room",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) {",
+                  "  pm.environment.set('createdRoomId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"R{{$randomInt}}\",\n  \"piso\": 8,\n  \"tipo\": \"SUITE\",\n  \"capacidadAdultos\": 2,\n  \"capacidadNinos\": 1,\n  \"precioPorNoche\": 320,\n  \"descripcion\": \"Suite creada por Postman\",\n  \"amenities\": \"WiFi,Jacuzzi,Smart TV\",\n  \"estado\": \"DISPONIBLE\",\n  \"imagenes\": \"https://example.com/room-postman.jpg\",\n  \"activa\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/rooms"
+          }
+        },
+        {
+          "name": "Update Created Room",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numero\": \"U{{$randomInt}}\",\n  \"piso\": 8,\n  \"tipo\": \"SUITE\",\n  \"capacidadAdultos\": 2,\n  \"capacidadNinos\": 1,\n  \"precioPorNoche\": 350,\n  \"descripcion\": \"Suite actualizada por Postman\",\n  \"amenities\": \"WiFi,Jacuzzi,Smart TV,Cafetera\",\n  \"estado\": \"DISPONIBLE\",\n  \"imagenes\": \"https://example.com/room-postman-update.jpg\",\n  \"activa\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/rooms/{{createdRoomId}}"
+          }
+        },
+        {
+          "name": "Deactivate Created Room",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/rooms/{{createdRoomId}}"
+          }
+        },
+        {
+          "name": "Create Hotel Service",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.id) {",
+                  "  pm.environment.set('createdServiceId', json.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cena Privada\",\n  \"descripcion\": \"Experiencia privada en terraza\",\n  \"categoria\": \"EXPERIENCIA\",\n  \"precio\": 120,\n  \"duracion\": 120,\n  \"horarioApertura\": \"18:00\",\n  \"horarioCierre\": \"22:00\",\n  \"requiereReserva\": true,\n  \"disponibleParaExternos\": false,\n  \"capacidadMaximaPorSlot\": 2,\n  \"activo\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/services"
+          }
+        },
+        {
+          "name": "Update Created Service",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cena Privada Premium\",\n  \"descripcion\": \"Experiencia premium en terraza\",\n  \"categoria\": \"EXPERIENCIA\",\n  \"precio\": 150,\n  \"duracion\": 150,\n  \"horarioApertura\": \"18:00\",\n  \"horarioCierre\": \"22:30\",\n  \"requiereReserva\": true,\n  \"disponibleParaExternos\": false,\n  \"capacidadMaximaPorSlot\": 2,\n  \"activo\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/services/{{createdServiceId}}"
+          }
+        },
+        {
+          "name": "Disable Created Service",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/services/{{createdServiceId}}/status?active=false"
+          }
+        }
+      ]
+    }
+  ]
+}

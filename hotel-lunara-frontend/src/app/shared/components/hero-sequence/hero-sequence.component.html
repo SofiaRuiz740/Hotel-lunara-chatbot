@@ -1,0 +1,7 @@
+<div #host class="hero-sequence">
+  <canvas #canvas class="hero-sequence__canvas"></canvas>
+  <div class="hero-sequence__overlay"></div>
+  <div class="hero-sequence__loading" [class.ready]="isReady()">
+    <span>Secuencia cargando {{ frameLabel() }}</span>
+  </div>
+</div>

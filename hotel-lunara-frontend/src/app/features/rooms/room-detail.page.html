@@ -1,0 +1,166 @@
+<div class="room-detail-page page-container page-block">
+  @if (loading()) {
+    <app-loading-skeleton [count]="2" cardHeight="24rem"></app-loading-skeleton>
+  } @else if (room(); as selectedRoom) {
+    <div class="room-detail-page__header">
+      <div>
+        <a class="quiet-button" routerLink="/habitaciones">Volver al catalogo</a>
+        <h1 class="title-lg">{{ getRoomTypeLabel(selectedRoom.tipo) }} · Habitacion {{ selectedRoom.numero }}</h1>
+        <p class="text-muted">{{ selectedRoom.descripcion }}</p>
+      </div>
+      <app-status-badge [status]="getRoomStatusLabel(selectedRoom.estado)"></app-status-badge>
+    </div>
+
+    <div class="room-detail-page__layout">
+      <section class="room-detail-page__content">
+        <div class="room-detail-page__gallery">
+          @for (image of gallery(); track image; let first = $first) {
+            <button class="room-detail-page__gallery-item" type="button" [class.featured]="first" (click)="openLightbox(image)">
+              <span [style.background-image]="'url(' + image + ')'"></span>
+            </button>
+          }
+        </div>
+
+        <div class="split-grid">
+          <article class="surface room-detail-page__panel">
+            <div class="surface__header">
+              <div>
+                <h2>Resumen</h2>
+                <p>Capacidad, estado y valor por noche.</p>
+              </div>
+            </div>
+            <div class="info-pairs">
+              <div>
+                <strong>Tipo</strong>
+                <span>{{ getRoomTypeLabel(selectedRoom.tipo) }}</span>
+              </div>
+              <div>
+                <strong>Capacidad</strong>
+                <span>{{ selectedRoom.capacidadAdultos }} adultos · {{ selectedRoom.capacidadNinos }} ninos</span>
+              </div>
+              <div>
+                <strong>Precio</strong>
+                <span>{{ currency(selectedRoom.precioPorNoche) }} por noche</span>
+              </div>
+              <div>
+                <strong>Piso</strong>
+                <span>{{ selectedRoom.piso }}</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="surface room-detail-page__panel">
+            <div class="surface__header">
+              <div>
+                <h2>Amenidades</h2>
+                <p>Infraestructura y comodidades principales.</p>
+              </div>
+            </div>
+            <div class="inline-list">
+              @for (item of amenities(); track item) {
+                <span class="chip">{{ item }}</span>
+              }
+            </div>
+          </article>
+        </div>
+
+        <article class="surface room-detail-page__panel">
+          <div class="surface__header">
+            <div>
+              <h2>Habitaciones relacionadas</h2>
+              <p>Alternativas del mismo tipo con otra ubicacion.</p>
+            </div>
+          </div>
+
+          @if (!similarRooms().length) {
+            <div class="empty-state">
+              <strong>No hay habitaciones similares disponibles ahora.</strong>
+              <p>Revisa el resto del catalogo o consulta nuevas fechas.</p>
+            </div>
+          } @else {
+            <div class="room-detail-page__similar-grid">
+              @for (item of similarRooms(); track item.id) {
+                <article class="room-detail-page__similar-card">
+                  <div class="room-detail-page__similar-image" [style.background-image]="'url(' + getRoomGallery(item)[0] + ')'"></div>
+                  <div class="room-detail-page__similar-body">
+                    <strong>Habitacion {{ item.numero }}</strong>
+                    <span>{{ currency(item.precioPorNoche) }} por noche</span>
+                    <a class="ghost-button" [routerLink]="['/habitaciones', item.id]">Abrir</a>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </article>
+      </section>
+
+      <aside class="room-detail-page__booking surface">
+        <div class="surface__header">
+          <div>
+            <h2>Reservar esta habitacion</h2>
+            <p>Formulario conectado a reservas del backend.</p>
+          </div>
+        </div>
+
+        <form class="form-grid" [formGroup]="reservationForm" (ngSubmit)="submitReservation()">
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="detailCheckIn">Check-in</label>
+              <input id="detailCheckIn" type="date" formControlName="checkIn" [min]="today" />
+            </div>
+            <div class="field-group">
+              <label for="detailCheckOut">Check-out</label>
+              <input id="detailCheckOut" type="date" formControlName="checkOut" [min]="reservationForm.controls.checkIn.value || today" />
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label>Adultos</label>
+              <div class="counter-control">
+                <button type="button" (click)="adjustCounter('cantidadAdultos', -1)">-</button>
+                <span>{{ reservationForm.controls.cantidadAdultos.value }}</span>
+                <button type="button" (click)="adjustCounter('cantidadAdultos', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label>Ninos</label>
+              <div class="counter-control">
+                <button type="button" (click)="adjustCounter('cantidadNinos', -1)">-</button>
+                <span>{{ reservationForm.controls.cantidadNinos.value }}</span>
+                <button type="button" (click)="adjustCounter('cantidadNinos', 1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="peticionesEspeciales">Peticiones especiales</label>
+            <textarea id="peticionesEspeciales" formControlName="peticionesEspeciales"></textarea>
+          </div>
+
+          <div class="room-detail-page__price-summary">
+            <div>
+              <span>Noches</span>
+              <strong>{{ nights() }}</strong>
+            </div>
+            <div>
+              <span>Total estimado</span>
+              <strong>{{ currency(total()) }}</strong>
+            </div>
+          </div>
+
+          <button class="primary-button" type="submit" [disabled]="savingReservation()">
+            {{ savingReservation() ? 'Guardando...' : (authService.isLoggedIn() ? 'Confirmar reserva' : 'Iniciar sesion para reservar') }}
+          </button>
+        </form>
+      </aside>
+    </div>
+
+    @if (lightboxImage(); as image) {
+      <app-modal-shell (closed)="closeLightbox()">
+        <img class="room-detail-page__lightbox" [src]="image" alt="Imagen de la habitacion" />
+      </app-modal-shell>
+    }
+  }
+</div>

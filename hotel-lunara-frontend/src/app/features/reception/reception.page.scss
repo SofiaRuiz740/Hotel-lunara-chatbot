@@ -1,0 +1,22 @@
+.reception-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.reception-page__panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.reception-page__room-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1080px) {
+  .reception-page__room-grid {
+    grid-template-columns: 1fr;
+  }
+}

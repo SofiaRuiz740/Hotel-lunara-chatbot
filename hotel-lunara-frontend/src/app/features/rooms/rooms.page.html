@@ -1,0 +1,126 @@
+<div class="rooms-page page-container page-block">
+  <div class="rooms-page__header">
+    <div>
+      <span class="eyebrow">Catalogo</span>
+      <h1 class="title-lg">Habitaciones mas claras, filtros mas utiles</h1>
+      <p class="text-muted">Busca por fechas, ocupacion, rango de precio y tipo sin perder contexto del inventario.</p>
+    </div>
+  </div>
+
+  <div class="rooms-page__layout">
+    <aside class="rooms-page__filters surface">
+      <div class="surface__header">
+        <div>
+          <h2>Filtros</h2>
+          <p>Ajusta disponibilidad y presupuesto.</p>
+        </div>
+      </div>
+
+      <form class="form-grid" [formGroup]="filtersForm">
+        <div class="form-grid form-grid--2">
+          <div class="field-group">
+            <label for="checkIn">Check-in</label>
+            <input id="checkIn" type="date" formControlName="checkIn" [min]="today" />
+          </div>
+          <div class="field-group">
+            <label for="checkOut">Check-out</label>
+            <input id="checkOut" type="date" formControlName="checkOut" [min]="filtersForm.controls.checkIn.value || today" />
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="field-group">
+            <label>Adultos</label>
+            <div class="counter-control">
+              <button type="button" (click)="adjustCounter('adults', -1)">-</button>
+              <span>{{ filtersForm.controls.adults.value }}</span>
+              <button type="button" (click)="adjustCounter('adults', 1)">+</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Ninos</label>
+            <div class="counter-control">
+              <button type="button" (click)="adjustCounter('children', -1)">-</button>
+              <span>{{ filtersForm.controls.children.value }}</span>
+              <button type="button" (click)="adjustCounter('children', 1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>Tipo de habitacion</label>
+          <div class="segmented-control">
+            @for (type of roomTypes; track type) {
+              <button type="button" [class.active]="filtersForm.controls.type.value === type" (click)="selectType(type)">
+                {{ getFilterTypeLabel(type) }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="field-group">
+            <label for="minPrice">Precio minimo</label>
+            <input id="minPrice" type="number" formControlName="minPrice" min="0" (change)="normalizePriceRange('min')" />
+          </div>
+          <div class="field-group">
+            <label for="maxPrice">Precio maximo</label>
+            <input id="maxPrice" type="number" formControlName="maxPrice" min="0" (change)="normalizePriceRange('max')" />
+          </div>
+        </div>
+      </form>
+    </aside>
+
+    <section class="rooms-page__results">
+      <div class="rooms-page__results-head">
+        <div>
+          <strong>{{ visibleRooms().length }}</strong>
+          <span>habitaciones visibles</span>
+        </div>
+      </div>
+
+      @if (loading()) {
+        <app-loading-skeleton [count]="4" cardHeight="22rem"></app-loading-skeleton>
+      } @else if (!visibleRooms().length) {
+        <div class="empty-state">
+          <strong>No hay resultados con esos filtros.</strong>
+          <p>Ajusta fechas, presupuesto o tipo de habitacion.</p>
+        </div>
+      } @else {
+        <div class="rooms-page__grid">
+          @for (room of visibleRooms(); track room.id) {
+            <article class="rooms-page__card surface">
+              <div class="rooms-page__card-image" [style.background-image]="'url(' + getRoomGallery(room)[0] + ')'"></div>
+              <div class="rooms-page__card-body">
+                <div class="rooms-page__card-top">
+                  <div>
+                    <strong>{{ getRoomTypeLabel(room.tipo) }}</strong>
+                    <span>Habitacion {{ room.numero }} · Piso {{ room.piso }}</span>
+                  </div>
+                  <app-status-badge [status]="getRoomStatusLabel(room.estado)"></app-status-badge>
+                </div>
+
+                <p>{{ truncateText(room.descripcion, 140) }}</p>
+
+                <div class="inline-list">
+                  @for (amenity of splitCommaValues(room.amenities).slice(0, 4); track amenity) {
+                    <span class="chip">{{ amenity }}</span>
+                  }
+                </div>
+
+                <div class="rooms-page__card-footer">
+                  <div>
+                    <strong>{{ currency(room.precioPorNoche) }}</strong>
+                    <span>por noche</span>
+                  </div>
+                  <a class="primary-button" [routerLink]="['/habitaciones', room.id]">Abrir detalle</a>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  </div>
+</div>

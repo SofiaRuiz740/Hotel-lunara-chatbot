@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: hotel_lunara_db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: hotel_lunara_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: hotel_lunara_backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL}
+      AI_PROVIDER: ${AI_PROVIDER}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+      OLLAMA_BASE_URL: http://ollama:11434/api/chat
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      SERVER_PORT: ${SERVER_PORT}
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  ollama_data:

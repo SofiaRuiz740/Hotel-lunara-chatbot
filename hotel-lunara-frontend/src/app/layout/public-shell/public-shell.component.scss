@@ -1,0 +1,13 @@
+.public-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at top left, rgba(184, 138, 86, 0.1), transparent 26%),
+    radial-gradient(circle at top right, rgba(29, 73, 84, 0.08), transparent 24%),
+    var(--color-bg);
+}
+
+.public-shell__body {
+  flex: 1;
+}

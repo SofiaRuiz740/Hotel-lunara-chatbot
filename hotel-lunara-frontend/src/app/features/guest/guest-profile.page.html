@@ -1,0 +1,110 @@
+<div class="guest-profile">
+  <header class="guest-profile__header">
+    <div>
+      <span class="eyebrow">Perfil</span>
+      <h1 class="title-lg">Datos del huesped y preferencias</h1>
+      <p class="text-muted">Actualiza la informacion que utiliza el backend para personalizar tu experiencia.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <app-loading-skeleton [count]="2" cardHeight="18rem"></app-loading-skeleton>
+  } @else {
+    <div class="split-grid">
+      <section class="surface guest-profile__summary">
+        <div class="surface__header">
+          <div>
+            <h2>Resumen de cuenta</h2>
+            <p>Informacion actual del usuario autenticado.</p>
+          </div>
+        </div>
+
+        <div class="info-pairs">
+          <div>
+            <strong>Correo</strong>
+            <span>{{ profile()?.email }}</span>
+          </div>
+          <div>
+            <strong>Rol</strong>
+            <span>{{ profile()?.role }}</span>
+          </div>
+          <div>
+            <strong>Idioma</strong>
+            <span>{{ profile()?.idioma }}</span>
+          </div>
+          <div>
+            <strong>Registro</strong>
+            <span>{{ profile()?.fechaRegistro }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface guest-profile__form">
+        <div class="surface__header">
+          <div>
+            <h2>Editar perfil</h2>
+            <p>Campos sincronizados con tu perfil actual.</p>
+          </div>
+        </div>
+
+        <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="profileNombre">Nombre</label>
+              <input id="profileNombre" type="text" formControlName="nombre" />
+            </div>
+            <div class="field-group">
+              <label for="profileApellido">Apellido</label>
+              <input id="profileApellido" type="text" formControlName="apellido" />
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="profileTelefono">Telefono</label>
+              <input id="profileTelefono" type="text" formControlName="telefono" />
+            </div>
+            <div class="field-group">
+              <label for="profileNacionalidad">Nacionalidad</label>
+              <input id="profileNacionalidad" type="text" formControlName="nacionalidad" />
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="profileDocumento">Documento</label>
+              <input id="profileDocumento" type="text" formControlName="documentoIdentidad" />
+            </div>
+            <div class="field-group">
+              <label for="profileIdioma">Idioma</label>
+              <select id="profileIdioma" formControlName="idioma">
+                <option value="ES">ES</option>
+                <option value="EN">EN</option>
+                <option value="FR">FR</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="profileAlergias">Alergias</label>
+            <input id="profileAlergias" type="text" formControlName="alergias" />
+          </div>
+
+          <div class="field-group">
+            <label for="profilePreferenciasCama">Preferencias de cama</label>
+            <input id="profilePreferenciasCama" type="text" formControlName="preferenciasCama" />
+          </div>
+
+          <div class="field-group">
+            <label for="profilePeticiones">Peticiones especiales</label>
+            <textarea id="profilePeticiones" formControlName="peticionesEspeciales"></textarea>
+          </div>
+
+          <button class="primary-button" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </form>
+      </section>
+    </div>
+  }
+</div>

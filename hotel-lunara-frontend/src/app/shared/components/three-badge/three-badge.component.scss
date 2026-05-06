@@ -1,0 +1,25 @@
+.three-badge {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+}
+
+.three-badge__canvas {
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.58), transparent 40%),
+    linear-gradient(180deg, rgba(245, 239, 230, 0.95), rgba(232, 213, 176, 0.68));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 1rem 2rem rgba(44, 24, 16, 0.12);
+}
+
+.three-badge__label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+}

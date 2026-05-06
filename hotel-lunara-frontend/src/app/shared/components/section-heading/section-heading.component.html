@@ -1,0 +1,9 @@
+<div class="sec-heading" [class.centered]="centered()">
+  @if (eyebrow()) {
+    <span class="sec-heading__eyebrow">{{ eyebrow() }}</span>
+  }
+  <h2 class="sec-heading__title">{{ title() }}</h2>
+  @if (subtitle()) {
+    <p class="sec-heading__sub">{{ subtitle() }}</p>
+  }
+</div>

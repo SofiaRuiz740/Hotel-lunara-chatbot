@@ -1,0 +1,58 @@
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-header__brand" routerLink="/home" (click)="closeMenu()">
+      <span class="site-header__brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 20V10.5L12 4l8 6.5V20" />
+          <path d="M9 20v-5h6v5" />
+          <path d="M8 10h8" />
+        </svg>
+      </span>
+      <span class="site-header__brand-copy">
+        <strong>Hotel Lunara</strong>
+        <small>Hospitalidad contemporanea</small>
+      </span>
+    </a>
+
+    <button class="site-header__menu-button" type="button" (click)="toggleMenu()" aria-label="Abrir menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="4" y1="7" x2="20" y2="7" />
+        <line x1="4" y1="12" x2="20" y2="12" />
+        <line x1="4" y1="17" x2="20" y2="17" />
+      </svg>
+    </button>
+
+    <div class="site-header__panel" [class.open]="menuOpen()">
+      <nav class="site-header__nav">
+        <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Inicio</a>
+        <a routerLink="/habitaciones" routerLinkActive="active" (click)="closeMenu()">Habitaciones</a>
+        <a routerLink="/concierge" routerLinkActive="active" (click)="closeMenu()">Concierge IA</a>
+      </nav>
+
+      <div class="site-header__actions">
+        @if (authService.isLoggedIn()) {
+          <a class="ghost-button" [routerLink]="dashboardRoute()" (click)="closeMenu()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            Mi panel
+          </a>
+          <button class="quiet-button" type="button" (click)="authService.logout(); closeMenu()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 17l5-5-5-5" />
+              <path d="M15 12H3" />
+              <path d="M20 4v16" />
+            </svg>
+            Cerrar sesion
+          </button>
+        } @else {
+          <a class="ghost-button" routerLink="/auth/login" (click)="closeMenu()">Iniciar sesion</a>
+          <a class="primary-button" routerLink="/auth/registro" (click)="closeMenu()">Crear cuenta</a>
+        }
+      </div>
+    </div>
+  </div>
+</header>

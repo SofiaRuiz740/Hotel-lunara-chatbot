@@ -1,0 +1,86 @@
+<div class="dashboard-shell">
+  @if (mobileSidebarOpen()) {
+    <button class="dashboard-shell__backdrop" type="button" (click)="mobileSidebarOpen.set(false)" aria-label="Cerrar menu"></button>
+  }
+
+  <aside class="dashboard-shell__sidebar" [class.open]="mobileSidebarOpen()">
+    <div class="dashboard-shell__brand">
+      <span class="dashboard-shell__brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 20V10.5L12 4l8 6.5V20" />
+          <path d="M9 20v-5h6v5" />
+        </svg>
+      </span>
+      <div>
+        <strong>Hotel Lunara</strong>
+        <span>{{ roleLabel() }}</span>
+      </div>
+    </div>
+
+    <div class="dashboard-shell__intro">
+      <strong>{{ shellTitle() }}</strong>
+      <p>{{ shellSubtitle() }}</p>
+    </div>
+
+    <nav class="dashboard-shell__nav">
+      @for (item of navItems(); track item.route) {
+        <a
+          class="dashboard-shell__nav-link"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          (click)="mobileSidebarOpen.set(false)"
+        >
+          <span class="dashboard-shell__nav-icon" [innerHTML]="item.icon"></span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="dashboard-shell__sidebar-footer">
+      <a class="ghost-button dashboard-shell__footer-link" routerLink="/home" (click)="mobileSidebarOpen.set(false)">
+        <span [innerHTML]="backIcon"></span>
+        Volver al sitio
+      </a>
+      <button class="quiet-button dashboard-shell__footer-link" type="button" (click)="authService.logout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10 17l5-5-5-5" />
+          <path d="M15 12H3" />
+          <path d="M20 4v16" />
+        </svg>
+        Cerrar sesion
+      </button>
+    </div>
+  </aside>
+
+  <div class="dashboard-shell__main">
+    <header class="dashboard-shell__topbar">
+      <button class="dashboard-shell__menu-button" type="button" (click)="mobileSidebarOpen.update((value) => !value)" aria-label="Abrir menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="4" y1="7" x2="20" y2="7" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="17" x2="20" y2="17" />
+        </svg>
+      </button>
+
+      <div class="dashboard-shell__topbar-copy">
+        <strong>{{ shellTitle() }}</strong>
+        <span>{{ authService.currentUser()?.email }}</span>
+      </div>
+
+      <div class="dashboard-shell__user">
+        <span class="dashboard-shell__user-avatar">
+          {{ (authService.currentUser()?.nombre ?? 'U')[0].toUpperCase() }}
+        </span>
+        <div>
+          <strong>{{ authService.currentUser()?.nombre }} {{ authService.currentUser()?.apellido }}</strong>
+          <span>{{ roleLabel() }}</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-shell__viewport">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

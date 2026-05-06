@@ -1,0 +1,115 @@
+<div class="guest-restaurant">
+  <header class="guest-restaurant__header">
+    <div>
+      <span class="eyebrow">Restaurante</span>
+      <h1 class="title-lg">Reserva mesa sin perder el contexto de tu estancia</h1>
+      <p class="text-muted">Consulta disponibilidad en tiempo real y relaciona la mesa con una reserva de hotel si aplica.</p>
+    </div>
+  </header>
+
+  <div class="split-grid">
+    <section class="surface guest-restaurant__panel">
+      <div class="surface__header">
+        <div>
+          <h2>Nueva reserva</h2>
+          <p>Completa fecha, hora, personas y ocasion.</p>
+        </div>
+      </div>
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-grid form-grid--2">
+          <div class="field-group">
+            <label for="restaurantDate">Fecha</label>
+            <input id="restaurantDate" type="date" formControlName="fecha" [min]="today" />
+          </div>
+          <div class="field-group">
+            <label for="restaurantTime">Hora</label>
+            <input id="restaurantTime" type="time" formControlName="hora" />
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="field-group">
+            <label for="restaurantPeople">Personas</label>
+            <input id="restaurantPeople" type="number" min="1" formControlName="cantidadPersonas" />
+          </div>
+          <div class="field-group">
+            <label for="restaurantOccasion">Ocasion</label>
+            <select id="restaurantOccasion" formControlName="ocasionEspecial">
+              @for (occasion of occasionOptions; track occasion) {
+                <option [value]="occasion">{{ occasion }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="restaurantReservationHotelId">Asociar a reserva de hotel</label>
+          <select id="restaurantReservationHotelId" formControlName="reservationHotelId">
+            <option [value]="0">Sin asociar</option>
+            @for (reservation of linkableReservations(); track reservation.id) {
+              <option [value]="reservation.id">
+                {{ reservation.codigoReserva }} · {{ getRoomTypeLabel(reservation.roomTipo) }} {{ reservation.roomNumero }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="restaurantNotes">Peticiones</label>
+          <textarea id="restaurantNotes" formControlName="peticiones"></textarea>
+        </div>
+
+        @if (availability(); as slots) {
+          <div class="guest-restaurant__availability">
+            <strong>{{ slots.mesasDisponibles.length }} mesas disponibles</strong>
+            <span>para {{ formatDate(slots.fecha) }} a las {{ formatTime(slots.hora) }}</span>
+          </div>
+        }
+
+        <button class="primary-button" type="submit" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : 'Confirmar mesa' }}
+        </button>
+      </form>
+    </section>
+
+    <section class="surface guest-restaurant__panel">
+      <div class="surface__header">
+        <div>
+          <h2>Proximas mesas</h2>
+          <p>Reservas de restaurante confirmadas.</p>
+        </div>
+      </div>
+
+      @if (loading()) {
+        <app-loading-skeleton [count]="2" cardHeight="12rem"></app-loading-skeleton>
+      } @else if (!upcomingReservations().length) {
+        <div class="empty-state">
+          <strong>No tienes mesas confirmadas.</strong>
+          <p>Las reservas nuevas apareceran aqui.</p>
+        </div>
+      } @else {
+        <div class="list-rows">
+          @for (reservation of upcomingReservations(); track reservation.id) {
+            <article class="list-row">
+              <div class="list-row__top">
+                <div>
+                  <strong>Mesa {{ reservation.tableNumero }}</strong>
+                  <span>{{ formatDate(reservation.fecha) }} · {{ formatTime(reservation.hora) }}</span>
+                </div>
+                <app-status-badge [status]="reservation.estado"></app-status-badge>
+              </div>
+              <div class="list-row__meta">
+                <span>{{ reservation.cantidadPersonas }} personas</span>
+                <span>{{ reservation.ocasionEspecial }}</span>
+              </div>
+              <div class="actions-row">
+                <button class="danger-button" type="button" (click)="cancelReservation(reservation.id)">Cancelar</button>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+.guest-dashboard {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.guest-dashboard__header,
+.guest-dashboard__actions,
+.guest-dashboard__restaurant-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.guest-dashboard__header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.guest-dashboard__actions {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.guest-dashboard__action,
+.guest-dashboard__panel {
+  padding: 1.2rem;
+}
+
+.guest-dashboard__action {
+  display: grid;
+  gap: 0.2rem;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.guest-dashboard__action:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.guest-dashboard__action span,
+.guest-dashboard__reservation span {
+  color: var(--color-text-secondary);
+}
+
+.guest-dashboard__reservation {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.guest-dashboard__reservation-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+@media (max-width: 1100px) {
+  .guest-dashboard__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .guest-dashboard__header,
+  .guest-dashboard__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .guest-dashboard__reservation-top {
+    flex-direction: column;
+  }
+}

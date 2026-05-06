@@ -1,0 +1,202 @@
+<div class="home-page">
+  @if (loading()) {
+    <section class="home-page__hero page-container">
+      <app-loading-skeleton [count]="1" cardHeight="34rem"></app-loading-skeleton>
+    </section>
+  } @else {
+    <section class="home-page__hero">
+      <div class="home-page__hero-media" [style.background-image]="'linear-gradient(90deg, rgba(8, 15, 18, 0.62), rgba(8, 15, 18, 0.2)), url(' + welcomeImage() + ')'"></div>
+      <div class="home-page__hero-content page-container">
+        <div class="home-page__hero-copy">
+          <span class="eyebrow">Hotel urbano premium</span>
+          <h1 class="title-xl">{{ hotelInfo()?.nombre ?? 'Hotel Lunara' }}</h1>
+          <p class="text-muted">
+            {{ truncateText(hotelInfo()?.descripcion ?? 'Una estancia limpia, moderna y comoda desde la reserva hasta el check-out.', 220) }}
+          </p>
+          <div class="actions-row">
+            <a class="primary-button" [routerLink]="bookStayRoute()">Reservar estancia</a>
+            <a class="ghost-button" routerLink="/habitaciones">Ver habitaciones</a>
+            <a class="ghost-button" routerLink="/concierge">Hablar con concierge</a>
+          </div>
+        </div>
+
+        <div class="home-page__hero-side surface">
+          <div class="surface__header">
+            <div>
+              <h2>Todo a la vista</h2>
+              <p>Una vista clara del hotel y sus servicios principales.</p>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            @for (stat of stats(); track stat.label) {
+              <div class="metric-card">
+                <span>{{ stat.label }}</span>
+                <strong>{{ stat.value }}</strong>
+                <p>{{ getStatLabel(stat.value, stat.label) }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="home-page__hero-notes">
+            <div>
+              <strong>Check-in</strong>
+              <span>{{ hotelInfo()?.horarioCheckIn ?? '15:00' }}</span>
+            </div>
+            <div>
+              <strong>Check-out</strong>
+              <span>{{ hotelInfo()?.horarioCheckOut ?? '11:00' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <section class="page-block page-container">
+    <div class="home-page__section-head">
+      <div>
+        <span class="eyebrow">Seleccionadas</span>
+        <h2 class="title-lg">Habitaciones pensadas para reservar rapido</h2>
+      </div>
+      <a class="ghost-button" routerLink="/habitaciones">Explorar inventario</a>
+    </div>
+
+    @if (loading()) {
+      <app-loading-skeleton [count]="3" cardHeight="24rem"></app-loading-skeleton>
+    } @else {
+      <div class="home-page__room-grid">
+        @for (room of featuredRooms(); track room.id) {
+          <article class="home-page__room-card surface">
+            <div class="home-page__room-media" [style.background-image]="'url(' + getRoomGallery(room)[0] + ')'"></div>
+            <div class="home-page__room-body">
+              <div class="home-page__room-top">
+                <div>
+                  <strong>{{ getRoomTypeLabel(room.tipo) }}</strong>
+                  <span>Habitacion {{ room.numero }} · Piso {{ room.piso }}</span>
+                </div>
+                <app-status-badge [status]="getRoomStatusLabel(room.estado)"></app-status-badge>
+              </div>
+              <p>{{ truncateText(room.descripcion, 120) }}</p>
+              <div class="home-page__room-footer">
+                <strong>{{ currency(room.precioPorNoche) }}</strong>
+                <a class="primary-button" [routerLink]="['/habitaciones', room.id]">Ver detalle</a>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="page-block page-container">
+    <div class="home-page__section-head">
+      <div>
+        <span class="eyebrow">Servicios</span>
+        <h2 class="title-lg">Experiencias y servicios del hotel</h2>
+      </div>
+      <a class="ghost-button" [routerLink]="guestRoute()">Ir a mi cuenta</a>
+    </div>
+
+    @if (loading()) {
+      <app-loading-skeleton [count]="3" cardHeight="18rem"></app-loading-skeleton>
+    } @else {
+      <div class="home-page__service-grid">
+        @for (service of showcasedServices(); track service.id) {
+          <article class="home-page__service-card surface">
+            <div class="home-page__service-top">
+              <span class="tag">{{ service.categoria }}</span>
+              <strong>{{ currency(service.precio) }}</strong>
+            </div>
+            <h3>{{ service.nombre }}</h3>
+            <p>{{ truncateText(service.descripcion, 140) }}</p>
+            <div class="home-page__service-meta">
+              <span>{{ service.duracion }} min</span>
+              <span>{{ service.horarioApertura.slice(0, 5) }} - {{ service.horarioCierre.slice(0, 5) }}</span>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="page-block page-container">
+    <div class="home-page__experience split-grid">
+      <article class="home-page__experience-copy surface">
+        <span class="eyebrow">Restaurante</span>
+        <h2 class="title-lg">Una experiencia simple para estancia, mesa y servicios</h2>
+        <p class="text-muted">
+          La interfaz publica prioriza decisiones claras: elegir habitacion, entender disponibilidad y entrar rapido al espacio de huesped.
+        </p>
+        <div class="inline-list">
+          @for (feature of hotelInfo()?.serviciosDestacados ?? []; track feature) {
+            <span class="chip">{{ feature }}</span>
+          }
+        </div>
+        <div class="actions-row">
+          <a class="primary-button" [routerLink]="bookTableRoute()">Reservar mesa</a>
+          <a class="ghost-button" routerLink="/concierge">Solicitar ayuda</a>
+        </div>
+      </article>
+
+      <article class="home-page__experience-media surface">
+        <div class="home-page__experience-image" [style.background-image]="'url(' + restaurantImage + ')'"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="page-block page-container">
+    <div class="home-page__section-head">
+      <div>
+        <span class="eyebrow">Testimonios</span>
+        <h2 class="title-lg">La experiencia se entiende en segundos</h2>
+      </div>
+    </div>
+
+    <div class="home-page__testimonial-grid">
+      @for (item of testimonials; track item.nombre) {
+        <article class="home-page__testimonial surface">
+          <div class="home-page__testimonial-top">
+            <img [src]="item.foto" [alt]="item.nombre" />
+            <div>
+              <strong>{{ item.nombre }}</strong>
+              <span>{{ item.pais }}</span>
+            </div>
+          </div>
+          <p>{{ item.comentario }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="page-block page-container">
+    <div class="home-page__contact split-grid">
+      <article class="home-page__contact-copy surface">
+        <span class="eyebrow">Ubicacion</span>
+        <h2 class="title-lg">Informacion de llegada, horarios y politicas</h2>
+        <div class="info-pairs">
+          <div>
+            <strong>Direccion</strong>
+            <span>{{ hotelInfo()?.direccion ?? 'Av. Principal 123, Ciudad' }}</span>
+          </div>
+          <div>
+            <strong>Telefono</strong>
+            <span>{{ hotelInfo()?.telefono ?? '+1 (555) 123 4567' }}</span>
+          </div>
+          <div>
+            <strong>Email</strong>
+            <span>{{ hotelInfo()?.email ?? 'info@hotellunara.com' }}</span>
+          </div>
+          <div>
+            <strong>Politica</strong>
+            <span>{{ truncateText(hotelInfo()?.politicaCancelacion ?? 'Cancelacion flexible segun reserva.', 90) }}</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="home-page__map surface">
+        <iframe [src]="mapUrl" title="Ubicacion Hotel Lunara" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </article>
+    </div>
+  </section>
+</div>

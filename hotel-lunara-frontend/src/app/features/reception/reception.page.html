@@ -1,0 +1,263 @@
+<div class="reception-page" [formGroup]="filtersForm">
+  <header class="reception-page__header">
+    <div>
+      <span class="eyebrow">Recepcion</span>
+      <h1 class="title-lg">Operacion diaria mas legible</h1>
+      <p class="text-muted">Check-in, check-out, reservas, solicitudes y habitaciones en una sola superficie de trabajo.</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <app-loading-skeleton [count]="4" cardHeight="16rem"></app-loading-skeleton>
+  } @else {
+    <section class="metric-grid">
+      <article class="metric-card">
+        <span>Ocupacion</span>
+        <strong>{{ occupancyRate() }}%</strong>
+        <p>{{ rooms().length }} habitaciones totales</p>
+      </article>
+      <article class="metric-card">
+        <span>Check-ins hoy</span>
+        <strong>{{ pendingCheckins().length }}</strong>
+        <p>Reservas listas para entrada.</p>
+      </article>
+      <article class="metric-card">
+        <span>Check-outs hoy</span>
+        <strong>{{ checkoutCandidates().length }}</strong>
+        <p>Salidas programadas para la fecha.</p>
+      </article>
+      <article class="metric-card">
+        <span>Servicios pendientes</span>
+        <strong>{{ pendingServiceRequests().length }}</strong>
+        <p>Solicitudes que requieren gestion.</p>
+      </article>
+    </section>
+
+    <section class="split-grid">
+      <article class="surface reception-page__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Check-ins de hoy</h2>
+            <p>Acciones directas sobre reservas confirmadas.</p>
+          </div>
+        </div>
+        @if (!pendingCheckins().length) {
+          <div class="empty-state">
+            <strong>No hay check-ins pendientes.</strong>
+            <p>Cuando existan reservas para ingresar apareceran aqui.</p>
+          </div>
+        } @else {
+          <div class="list-rows">
+            @for (reservation of pendingCheckins(); track reservation.id) {
+              <article class="list-row">
+                <div class="list-row__top">
+                  <div>
+                    <strong>{{ reservation.guestNombreCompleto }}</strong>
+                    <span>{{ reservation.codigoReserva }} · Habitacion {{ reservation.roomNumero }}</span>
+                  </div>
+                  <button class="primary-button" type="button" (click)="runCheckin(reservation.id)">Registrar check-in</button>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </article>
+
+      <article class="surface reception-page__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Check-outs de hoy</h2>
+            <p>Cierre rapido de estancias activas o programadas.</p>
+          </div>
+        </div>
+        @if (!checkoutCandidates().length) {
+          <div class="empty-state">
+            <strong>No hay check-outs para hoy.</strong>
+            <p>El flujo de salida aparecera cuando existan reservas activas.</p>
+          </div>
+        } @else {
+          <div class="list-rows">
+            @for (reservation of checkoutCandidates(); track reservation.id) {
+              <article class="list-row">
+                <div class="list-row__top">
+                  <div>
+                    <strong>{{ reservation.guestNombreCompleto }}</strong>
+                    <span>{{ reservation.codigoReserva }} · Habitacion {{ reservation.roomNumero }}</span>
+                  </div>
+                  <button class="primary-button" type="button" (click)="runCheckout(reservation.id)">Registrar check-out</button>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </article>
+    </section>
+
+    <section class="surface reception-page__panel">
+      <div class="surface__header">
+        <div>
+          <h2>Reservas</h2>
+          <p>Busqueda por estado, fecha o huesped.</p>
+        </div>
+      </div>
+
+      <div class="form-grid form-grid--3">
+        <div class="field-group">
+          <label for="reservationQuery">Buscar</label>
+          <input id="reservationQuery" type="text" formControlName="reservationQuery" />
+        </div>
+        <div class="field-group">
+          <label for="reservationStatus">Estado</label>
+          <select id="reservationStatus" formControlName="reservationStatus">
+            <option value="ALL">Todos</option>
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="CONFIRMADA">Confirmada</option>
+            <option value="ACTIVA">Activa</option>
+            <option value="COMPLETADA">Completada</option>
+            <option value="CANCELADA">Cancelada</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="reservationDate">Fecha de check-in</label>
+          <input id="reservationDate" type="date" formControlName="reservationDate" />
+        </div>
+      </div>
+
+      <div class="table-shell">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Reserva</th>
+              <th>Huesped</th>
+              <th>Fechas</th>
+              <th>Total</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (reservation of filteredReservations(); track reservation.id) {
+              <tr>
+                <td>
+                  <strong>{{ reservation.codigoReserva }}</strong>
+                  <span>Habitacion {{ reservation.roomNumero }}</span>
+                </td>
+                <td>{{ reservation.guestNombreCompleto }}</td>
+                <td>{{ formatDate(reservation.checkIn) }} - {{ formatDate(reservation.checkOut) }}</td>
+                <td>{{ reservation.precioTotal }}</td>
+                <td><app-status-badge [status]="reservation.estado"></app-status-badge></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="split-grid">
+      <article class="surface reception-page__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Solicitudes de servicio</h2>
+            <p>Cambia el estado sin salir del panel.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="serviceQuery">Buscar huesped o servicio</label>
+          <input id="serviceQuery" type="text" formControlName="serviceQuery" />
+        </div>
+
+        @if (!filteredServiceRequests().length) {
+          <div class="empty-state">
+            <strong>No hay solicitudes visibles.</strong>
+            <p>Prueba con otro filtro o espera nuevas entradas.</p>
+          </div>
+        } @else {
+          <div class="list-rows">
+            @for (request of filteredServiceRequests(); track request.id) {
+              <article class="list-row">
+                <div class="list-row__top">
+                  <div>
+                    <strong>{{ request.guestNombreCompleto }}</strong>
+                    <span>{{ request.serviceNombre }} · {{ formatDate(request.fechaSolicitada) }} {{ formatTime(request.horaSolicitada) }}</span>
+                  </div>
+                  <app-status-badge [status]="request.estado"></app-status-badge>
+                </div>
+                <div class="actions-row">
+                  <button class="ghost-button" type="button" (click)="updateServiceStatus(request.id, 'CONFIRMADO')">Confirmar</button>
+                  <button class="ghost-button" type="button" (click)="updateServiceStatus(request.id, 'EN_PROCESO')">En proceso</button>
+                  <button class="ghost-button" type="button" (click)="updateServiceStatus(request.id, 'COMPLETADO')">Completar</button>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </article>
+
+      <article class="surface reception-page__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Reservas de restaurante</h2>
+            <p>Gestiona mesas confirmadas y no-show.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="restaurantQuery">Buscar huesped</label>
+          <input id="restaurantQuery" type="text" formControlName="restaurantQuery" />
+        </div>
+
+        @if (!filteredRestaurantReservations().length) {
+          <div class="empty-state">
+            <strong>No hay reservas visibles.</strong>
+            <p>Usa otra busqueda o revisa mas tarde.</p>
+          </div>
+        } @else {
+          <div class="list-rows">
+            @for (reservation of filteredRestaurantReservations(); track reservation.id) {
+              <article class="list-row">
+                <div class="list-row__top">
+                  <div>
+                    <strong>{{ reservation.guestNombreCompleto }}</strong>
+                    <span>Mesa {{ reservation.tableNumero }} · {{ formatDate(reservation.fecha) }} {{ formatTime(reservation.hora) }}</span>
+                  </div>
+                  <app-status-badge [status]="reservation.estado"></app-status-badge>
+                </div>
+                <div class="actions-row">
+                  <button class="ghost-button" type="button" (click)="updateRestaurantStatus(reservation.id, 'COMPLETADA')">Completar</button>
+                  <button class="danger-button" type="button" (click)="updateRestaurantStatus(reservation.id, 'NO_SHOW')">No show</button>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </article>
+    </section>
+
+    <section class="surface reception-page__panel">
+      <div class="surface__header">
+        <div>
+          <h2>Estado de habitaciones</h2>
+          <p>Accesos rapidos para limpieza y mantenimiento.</p>
+        </div>
+      </div>
+
+      <div class="reception-page__room-grid">
+        @for (room of rooms(); track room.id) {
+          <article class="list-row">
+            <div class="list-row__top">
+              <div>
+                <strong>{{ room.numero }}</strong>
+                <span>{{ room.tipo }} · Piso {{ room.piso }}</span>
+              </div>
+              <app-status-badge [status]="room.estado"></app-status-badge>
+            </div>
+            <div class="actions-row">
+              <button class="ghost-button" type="button" (click)="updateRoomStatus(room.id, 'LIMPIEZA')">Limpieza</button>
+              <button class="ghost-button" type="button" (click)="updateRoomStatus(room.id, 'MANTENIMIENTO')">Mantenimiento</button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</div>

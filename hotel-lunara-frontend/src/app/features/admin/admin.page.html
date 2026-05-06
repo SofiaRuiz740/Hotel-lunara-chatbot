@@ -1,0 +1,449 @@
+<div class="admin-page">
+  <header class="admin-page__header">
+    <div>
+      <span class="eyebrow">Administracion</span>
+      <h1 class="title-lg">Control operativo del hotel</h1>
+      <p class="text-muted">Revisa resumen, habitaciones, usuarios, servicios y auditoria desde el mismo panel.</p>
+    </div>
+  </header>
+
+  <div class="segmented-control">
+    @for (section of sections; track section) {
+      <button type="button" [class.active]="activeSection() === section" (click)="setSection(section)">
+        {{ section | titlecase }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <app-loading-skeleton [count]="4" cardHeight="16rem"></app-loading-skeleton>
+  } @else {
+    @if (activeSection() === 'overview') {
+      <section class="metric-grid">
+        <article class="metric-card">
+          <span>Habitaciones ocupadas</span>
+          <strong>{{ dashboard()?.habitacionesOcupadas ?? 0 }}</strong>
+          <p>de {{ dashboard()?.totalHabitaciones ?? 0 }}</p>
+        </article>
+        <article class="metric-card">
+          <span>Reservas hoy</span>
+          <strong>{{ dashboard()?.reservasHoy ?? 0 }}</strong>
+          <p>Check-outs: {{ dashboard()?.checkoutsHoy ?? 0 }}</p>
+        </article>
+        <article class="metric-card">
+          <span>Ingresos del mes</span>
+          <strong>{{ currency(dashboard()?.ingresosMesActual ?? 0) }}</strong>
+          <p>Resumen financiero actual.</p>
+        </article>
+        <article class="metric-card">
+          <span>Solicitudes pendientes</span>
+          <strong>{{ dashboard()?.solicitudesPendientes ?? 0 }}</strong>
+          <p>Servicios con seguimiento activo.</p>
+        </article>
+      </section>
+
+      <section class="split-grid">
+        <article class="surface admin-page__panel">
+          <div class="surface__header">
+            <div>
+              <h2>Inventario resumido</h2>
+              <p>Estado actual de habitaciones y usuarios.</p>
+            </div>
+          </div>
+          <div class="info-pairs">
+            <div>
+              <strong>Disponibles</strong>
+              <span>{{ dashboard()?.habitacionesDisponibles ?? 0 }}</span>
+            </div>
+            <div>
+              <strong>Mantenimiento</strong>
+              <span>{{ dashboard()?.habitacionesMantenimiento ?? 0 }}</span>
+            </div>
+            <div>
+              <strong>Huespedes registrados</strong>
+              <span>{{ dashboard()?.totalHuespedesRegistrados ?? 0 }}</span>
+            </div>
+            <div>
+              <strong>Reservas activas</strong>
+              <span>{{ dashboard()?.reservasActivasTotales ?? 0 }}</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="surface admin-page__panel">
+          <div class="surface__header">
+            <div>
+              <h2>Auditoria reciente</h2>
+              <p>Ultimos eventos relevantes.</p>
+            </div>
+          </div>
+          <div class="list-rows">
+            @for (log of auditLogs().slice(0, 5); track log.id) {
+              <div class="list-row">
+                <strong>{{ log.accion }}</strong>
+                <span>{{ log.entidad }} · {{ formatDateTime(log.timestamp) }}</span>
+              </div>
+            }
+          </div>
+        </article>
+      </section>
+    }
+
+    @if (activeSection() === 'rooms') {
+      <section class="surface admin-page__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Habitaciones</h2>
+            <p>Crea, edita o desactiva habitaciones.</p>
+          </div>
+          <button class="primary-button" type="button" (click)="openRoomModal()">Nueva habitacion</button>
+        </div>
+
+        <div class="table-shell">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Numero</th>
+                <th>Tipo</th>
+                <th>Capacidad</th>
+                <th>Precio</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (room of rooms(); track room.id) {
+                <tr>
+                  <td><strong>{{ room.numero }}</strong></td>
+                  <td>{{ getRoomTypeLabel(room.tipo) }}</td>
+                  <td>{{ room.capacidadAdultos }} / {{ room.capacidadNinos }}</td>
+                  <td>{{ currency(room.precioPorNoche) }}</td>
+                  <td><app-status-badge [status]="room.estado"></app-status-badge></td>
+                  <td>
+                    <div class="actions-row">
+                      <button class="ghost-button" type="button" (click)="openRoomModal(room)">Editar</button>
+                      <button class="danger-button" type="button" (click)="deactivateRoom(room.id)">Desactivar</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'users') {
+      <section class="surface admin-page__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Usuarios</h2>
+            <p>Gestiona roles y estado de acceso.</p>
+          </div>
+          <button class="primary-button" type="button" (click)="receptionistModalOpen.set(true)">Crear recepcionista</button>
+        </div>
+
+        <div class="field-group">
+          <label for="userQuery">Buscar usuario</label>
+          <input id="userQuery" type="text" [formControl]="filterForm.controls.userQuery" />
+        </div>
+
+        <div class="table-shell">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of filteredUsers(); track user.id) {
+                <tr>
+                  <td>
+                    <strong>{{ user.nombre }} {{ user.apellido }}</strong>
+                    <span>{{ user.email }}</span>
+                  </td>
+                  <td>{{ user.role }}</td>
+                  <td>{{ user.activo ? 'Activo' : 'Inactivo' }}</td>
+                  <td>
+                    <div class="actions-row">
+                      <button class="ghost-button" type="button" (click)="changeUserRole(user.id, 'GUEST')">Guest</button>
+                      <button class="ghost-button" type="button" (click)="changeUserRole(user.id, 'RECEPTIONIST')">Recepcion</button>
+                      <button class="ghost-button" type="button" (click)="changeUserRole(user.id, 'ADMIN')">Admin</button>
+                      <button class="danger-button" type="button" (click)="changeUserStatus(user.id, !user.activo)">
+                        {{ user.activo ? 'Desactivar' : 'Activar' }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'services') {
+      <section class="surface admin-page__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Servicios</h2>
+            <p>Publica o edita la oferta operativa del hotel.</p>
+          </div>
+          <button class="primary-button" type="button" (click)="openServiceModal()">Nuevo servicio</button>
+        </div>
+
+        <div class="panel-grid">
+          @for (service of services(); track service.id) {
+            <article class="list-row">
+              <div class="list-row__top">
+                <div>
+                  <strong>{{ service.nombre }}</strong>
+                  <span>{{ service.categoria }} · {{ currency(service.precio) }}</span>
+                </div>
+                <span class="tag">{{ service.activo ? 'Activo' : 'Inactivo' }}</span>
+              </div>
+              <p class="text-soft">{{ service.descripcion }}</p>
+              <div class="actions-row">
+                <button class="ghost-button" type="button" (click)="openServiceModal(service)">Editar</button>
+                <button class="danger-button" type="button" (click)="toggleService(service)">
+                  {{ service.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'audit') {
+      <section class="surface admin-page__panel">
+        <div class="surface__header">
+          <div>
+            <h2>Auditoria</h2>
+            <p>Busqueda rapida sobre logs del sistema.</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="auditQuery">Buscar evento</label>
+          <input id="auditQuery" type="text" [formControl]="filterForm.controls.auditQuery" />
+        </div>
+
+        <div class="table-shell">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Accion</th>
+                <th>Entidad</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (log of filteredAuditLogs(); track log.id) {
+                <tr>
+                  <td><strong>{{ log.accion }}</strong></td>
+                  <td>{{ log.entidad }} #{{ log.entidadId }}</td>
+                  <td>{{ log.usuarioEmail ?? 'Sistema' }}</td>
+                  <td>{{ formatDateTime(log.timestamp) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  }
+
+  @if (roomModalOpen()) {
+    <app-modal-shell (closed)="roomModalOpen.set(false)">
+      <div class="admin-page__modal">
+        <div class="surface__header">
+          <div>
+            <h2>{{ selectedRoom() ? 'Editar habitacion' : 'Nueva habitacion' }}</h2>
+            <p>Configuracion operativa de inventario.</p>
+          </div>
+        </div>
+
+        <form class="form-grid" [formGroup]="roomForm" (ngSubmit)="saveRoom()">
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="roomNumero">Numero</label>
+              <input id="roomNumero" type="text" formControlName="numero" />
+            </div>
+            <div class="field-group">
+              <label for="roomPiso">Piso</label>
+              <input id="roomPiso" type="number" formControlName="piso" />
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--3">
+            <div class="field-group">
+              <label for="roomTipo">Tipo</label>
+              <select id="roomTipo" formControlName="tipo">
+                <option value="SIMPLE">Simple</option>
+                <option value="DOBLE">Doble</option>
+                <option value="SUITE">Suite</option>
+                <option value="PENTHOUSE">Penthouse</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="roomAdults">Adultos</label>
+              <input id="roomAdults" type="number" formControlName="capacidadAdultos" />
+            </div>
+            <div class="field-group">
+              <label for="roomKids">Ninos</label>
+              <input id="roomKids" type="number" formControlName="capacidadNinos" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="roomPrice">Precio por noche</label>
+            <input id="roomPrice" type="number" formControlName="precioPorNoche" />
+          </div>
+
+          <div class="field-group">
+            <label for="roomDescription">Descripcion</label>
+            <textarea id="roomDescription" formControlName="descripcion"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="roomAmenities">Amenidades</label>
+            <input id="roomAmenities" type="text" formControlName="amenities" />
+          </div>
+
+          <div class="field-group">
+            <label for="roomImages">Imagenes</label>
+            <input id="roomImages" type="text" formControlName="imagenes" />
+          </div>
+
+          <div class="field-group">
+            <label for="roomStatus">Estado</label>
+            <select id="roomStatus" formControlName="estado">
+              <option value="DISPONIBLE">Disponible</option>
+              <option value="OCUPADA">Ocupada</option>
+              <option value="MANTENIMIENTO">Mantenimiento</option>
+              <option value="LIMPIEZA">Limpieza</option>
+            </select>
+          </div>
+
+          <button class="primary-button" type="submit">Guardar habitacion</button>
+        </form>
+      </div>
+    </app-modal-shell>
+  }
+
+  @if (serviceModalOpen()) {
+    <app-modal-shell (closed)="serviceModalOpen.set(false)">
+      <div class="admin-page__modal">
+        <div class="surface__header">
+          <div>
+            <h2>{{ selectedService() ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
+            <p>Configuracion del portafolio del hotel.</p>
+          </div>
+        </div>
+
+        <form class="form-grid" [formGroup]="serviceForm" (ngSubmit)="saveService()">
+          <div class="field-group">
+            <label for="serviceName">Nombre</label>
+            <input id="serviceName" type="text" formControlName="nombre" />
+          </div>
+          <div class="field-group">
+            <label for="serviceDescription">Descripcion</label>
+            <textarea id="serviceDescription" formControlName="descripcion"></textarea>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="serviceCategory">Categoria</label>
+              <input id="serviceCategory" type="text" formControlName="categoria" />
+            </div>
+            <div class="field-group">
+              <label for="servicePrice">Precio</label>
+              <input id="servicePrice" type="number" formControlName="precio" />
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--3">
+            <div class="field-group">
+              <label for="serviceDuration">Duracion</label>
+              <input id="serviceDuration" type="number" formControlName="duracion" />
+            </div>
+            <div class="field-group">
+              <label for="serviceOpen">Apertura</label>
+              <input id="serviceOpen" type="time" formControlName="horarioApertura" />
+            </div>
+            <div class="field-group">
+              <label for="serviceClose">Cierre</label>
+              <input id="serviceClose" type="time" formControlName="horarioCierre" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="serviceCapacity">Capacidad por slot</label>
+            <input id="serviceCapacity" type="number" formControlName="capacidadMaximaPorSlot" />
+          </div>
+
+          <button class="primary-button" type="submit">Guardar servicio</button>
+        </form>
+      </div>
+    </app-modal-shell>
+  }
+
+  @if (receptionistModalOpen()) {
+    <app-modal-shell (closed)="receptionistModalOpen.set(false)">
+      <div class="admin-page__modal">
+        <div class="surface__header">
+          <div>
+            <h2>Nuevo recepcionista</h2>
+            <p>Alta rapida de cuentas operativas.</p>
+          </div>
+        </div>
+
+        <form class="form-grid" [formGroup]="receptionistForm" (ngSubmit)="createReceptionist()">
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="receptionistName">Nombre</label>
+              <input id="receptionistName" type="text" formControlName="nombre" />
+            </div>
+            <div class="field-group">
+              <label for="receptionistLastName">Apellido</label>
+              <input id="receptionistLastName" type="text" formControlName="apellido" />
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="field-group">
+              <label for="receptionistEmail">Correo</label>
+              <input id="receptionistEmail" type="email" formControlName="email" />
+            </div>
+            <div class="field-group">
+              <label for="receptionistPassword">Contrasena</label>
+              <input id="receptionistPassword" type="password" formControlName="password" />
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--3">
+            <div class="field-group">
+              <label for="receptionistPhone">Telefono</label>
+              <input id="receptionistPhone" type="text" formControlName="telefono" />
+            </div>
+            <div class="field-group">
+              <label for="receptionistNationality">Nacionalidad</label>
+              <input id="receptionistNationality" type="text" formControlName="nacionalidad" />
+            </div>
+            <div class="field-group">
+              <label for="receptionistDocument">Documento</label>
+              <input id="receptionistDocument" type="text" formControlName="documentoIdentidad" />
+            </div>
+          </div>
+
+          <button class="primary-button" type="submit">Crear recepcionista</button>
+        </form>
+      </div>
+    </app-modal-shell>
+  }
+</div>

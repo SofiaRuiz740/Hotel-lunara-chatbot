@@ -1,0 +1,4 @@
+com\hotellunara\reservation\ReservationServiceTest.class
+com\hotellunara\security\ConciergeRateLimitServiceTest.class
+com\hotellunara\concierge\ConciergeServiceTest.class
+com\hotellunara\restaurant\RestaurantServiceTest.class
